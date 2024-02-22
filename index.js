@@ -1,21 +1,48 @@
 const express = require("express");
 const app = express();
-const connectDB = require("./Database/connectDB"); // Import the connectDB function from the external file
+const connectDB = require("./Database/connectDB");
 require("dotenv").config();
+const cors = require("cors");
+const session = require("express-session");
+const passport = require("passport");
 
-const authRoutes = require("./Routes/authRoutes")
+const authRoutes = require("./Routes/authRoutes");
 
+// Setup express middleware
+app.use(
+  cors({
+    origin: ["https://www.google.com", "http://localhost:5173"],
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  })
+);
+
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// Initialize passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Your routes
 app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-app.use("/", express.json(), authRoutes)
+require("./Routes/signInGoogle")
+
+// Your other routes
+app.use("/", express.json(), authRoutes);
 
 const port = 3000;
 
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI); // Use the imported connectDB function
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}...`);
     });
