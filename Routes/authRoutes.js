@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../Models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const passport = require("passport");
 
 // ! Email validation regex pattern
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,9 +41,13 @@ router.post("/auth/register", async (req, res) => {
 
     await newUser.save();
 
-    const token = jwt.sign({userId: newUser._id}, process.env.JWT_SECRET, {expiresIn: "5d"} )
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "5d",
+    });
 
-    res.status(200).send({ message: "User registered successfully", token: token });
+    res
+      .status(200)
+      .send({ message: "User registered successfully", token: token });
   } catch (error) {
     console.error("Error Registering user", error);
     res.status(500).send({ error: "Internal Server Error" });
@@ -50,36 +55,52 @@ router.post("/auth/register", async (req, res) => {
 });
 
 router.post("/auth/login", async (req, res) => {
-    try {
-        const {email, password} = req.body
-        const user = await User.findOne({email})
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-        if (email === "" || password === "") {
-            return res.status(400).send({error: "Please fill all inputs"})
-        }
-
-        if (!email || !password) {
-            return res.status(400).send({error: "Please provide email and password"})
-        }
-
-        if (!user) {
-            return res.status(400).send({error: "Invalid Email Address"})
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password)
-
-        if (!isPasswordValid) {
-            return res.status(401).send({error: "Invalid Password"})
-        }
-
-        const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: "5d"})
-
-        res.status(200).send({message: "Logged In", token: token})
-
-    } catch (error) {
-        console.error("Error Signing In User", error)
-        res.status(500).send({error: "Internal Server Error"})
+    if (email === "" || password === "") {
+      return res.status(400).send({ error: "Please fill all inputs" });
     }
-})
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .send({ error: "Please provide email and password" });
+    }
+
+    if (!user) {
+      return res.status(400).send({ error: "Invalid Email Address" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send({ error: "Invalid Password" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "5d",
+    });
+
+    res.status(200).send({ message: "Logged In", token: token });
+  } catch (error) {
+    console.error("Error Signing In User", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+// Google OAuth login route
+router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+
+// Google OAuth callback route
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "http://localhost:5173", // Update with your frontend success redirect URL
+    failureRedirect: "http://localhost:5173/login", // Update with your frontend failure redirect URL
+  })
+);
+
 
 module.exports = router;
