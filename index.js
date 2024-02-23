@@ -4,6 +4,7 @@ const connectDB = require("./Database/connectDB");
 require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
+const flash = require("connect-flash");
 const passport = require("passport");
 
 const authRoutes = require("./Routes/authRoutes");
@@ -24,6 +25,10 @@ app.use(
   })
 );
 
+// Configure flash messages
+app.use(flash());
+
+
 // Initialize passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
@@ -33,7 +38,7 @@ app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-require("./Routes/signInGoogle")
+require("./Routes/signInGoogle");
 
 // Your other routes
 app.use("/", express.json(), authRoutes);
