@@ -13,23 +13,29 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ googleId: profile.id });
+        let user = await User.findOne({ email: profile.email });
+
+        if (user) {
+          // User already exists, redirect to the login page
+          return done(null, false, {
+            message: "User already exists. Please log in.",
+          });
+        }
 
         const hashedPassword = await bcrypt.hash(
-          process.env.Google_Users_Password, 10
+          process.env.Google_Users_Password,
+          10
         );
 
-        if (!user) {
-          user = new User({
-            googleId: profile.id,
-            fullName: profile.displayName,
-            email: profile.emails[0].value,
-            image: profile.photos[0].value,
-            password: hashedPassword,
-          });
+        user = new User({
+          googleId: profile.id,
+          fullName: profile.displayName,
+          email: profile.emails[0].value,
+          image: profile.photos[0].value,
+          password: hashedPassword,
+        });
 
-          await user.save();
-        }
+        await user.save();
 
         return done(null, user);
       } catch (error) {
