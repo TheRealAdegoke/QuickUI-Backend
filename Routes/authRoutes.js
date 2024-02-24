@@ -98,8 +98,8 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     successRedirect: "http://localhost:5173",
-    failureRedirect: "http://localhost:5173/login", // This will be triggered only if the user already exists
-    failureFlash: true, // Enable flash messages for failureRedirect
+    failureRedirect: "http://localhost:5173/register?error=userExists",
+    failureFlash: true,
   })
 );
 
