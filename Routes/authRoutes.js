@@ -97,11 +97,29 @@ router.get("/auth/google", passport.authenticate("google", { scope: ["profile", 
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    successRedirect: "http://localhost:5173",
     failureRedirect: "http://localhost:5173/register?error=userExists",
     failureFlash: true,
-  })
+  }),
+  async (req, res) => {
+    try {
+      // User is successfully authenticated via Google OAuth
+      const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
+        expiresIn: "5d",
+      });
+
+      console.log(token);
+
+      res.cookie("token", token);
+
+      // Redirect to the desired URL without including the token in the URL
+      res.redirect("http://localhost:5173/register");
+    } catch (error) {
+      console.error("Error processing Google OAuth callback", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
 );
+
 
 
 module.exports = router;

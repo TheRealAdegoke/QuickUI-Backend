@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const connectDB = require("./Database/connectDB");
 require("dotenv").config();
@@ -8,6 +9,9 @@ const flash = require("connect-flash");
 const passport = require("passport");
 
 const authRoutes = require("./Routes/authRoutes");
+
+app.use(express.json());
+app.use(cookieParser());
 
 // Setup express middleware
 app.use(
@@ -41,7 +45,7 @@ app.get("/", (req, res) => {
 require("./Routes/signInGoogle");
 
 // Your other routes
-app.use("/", express.json(), authRoutes);
+app.use("/", authRoutes);
 
 const port = 3000;
 
