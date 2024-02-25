@@ -112,7 +112,7 @@ router.get(
       res.cookie("token", token);
 
       // Redirect to the desired URL without including the token in the URL
-      res.redirect("http://localhost:5173/register");
+      res.redirect("http://localhost:5173/");
     } catch (error) {
       console.error("Error processing Google OAuth callback", error);
       res.status(500).send({ error: "Internal Server Error" });
