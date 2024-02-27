@@ -28,10 +28,8 @@ passport.use(
         );
 
         user = new User({
-          googleId: profile.id,
           fullName: profile.displayName,
           email: profile.emails[0].value,
-          image: profile.photos[0].value,
           password: hashedPassword,
         });
 
