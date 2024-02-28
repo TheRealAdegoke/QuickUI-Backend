@@ -261,14 +261,17 @@ async function sendResetPasswordLink(email, fullName, token) {
   }
 }
 
-// ! Route to handle reset password action
 router.post("/auth/resetpassword", async (req, res) => {
   try {
     const { token, password } = req.body;
 
     // ! Check if the token and new password are provided
-    if (!token || !password) {
-      return res.status(400).send({ error: "Token and password are required" });
+    if (!token) {
+      return res.status(400).send({ error: "Token is required" });
+    }
+
+    if (!password) {
+      return res.status(400).send({ error: "Password is required" });
     }
 
     // ! Check if the token is valid and not expired
