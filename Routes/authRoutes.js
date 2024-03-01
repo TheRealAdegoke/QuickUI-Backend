@@ -146,38 +146,81 @@ router.post("/auth/login", async (req, res) => {
   }
 });
 
-// Google OAuth login route
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/auth/googlesignup", async (req, res, next) => {
+  try {
+    const profile = req.user;
+    let user = await User.findOne({ email: profile.email });
 
-// Google OAuth callback route
+    if (user) {
+      return res.redirect("http://localhost:5173/register?error=userExists");
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      process.env.Google_Users_Password,
+      10
+    );
+
+    newUser = new User({
+      fullName: profile.displayName,
+      email: profile.emails[0].value,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "5d",
+    });
+
+    console.log(token);
+
+    res.cookie("token", token)
+
+    return res.redirect("http://localhost:5173/dashboard");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/auth/googlelogin", async (req, res, next) => {
+  try {
+    const profile = req.user;
+    let user = await User.findOne({ email: profile.email });
+
+    if (!user) {
+      return res.redirect("http://localhost:5173/login?error=invalidUser");
+    }
+
+    const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: "5d"})
+
+    console.log(token);
+    res.cookie("token", token)
+
+    return res.redirect("http://localhost:5173/dashboard");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/google", passport.authenticate("google", ["profile", "email"]));
+
+
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:5173/register?error=userExists",
-    failureFlash: true,
-  }),
-  async (req, res) => {
-    try {
-      // User is successfully authenticated via Google OAuth
-      const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, {
-        expiresIn: "5d",
-      });
-
-      console.log(token);
-
-      res.cookie("token", token);
-
-      // Redirect to the desired URL without including the token in the URL
-      res.redirect("http://localhost:5173/dashboard");
-    } catch (error) {
-      console.error("Error processing Google OAuth callback", error);
-      res.status(500).send({ error: "Internal Server Error" });
-    }
-  }
+    successRedirect: "/auth/googlesignup",
+    callbackURL: "http://localhost:3000/auth/google/callback",
+  })
 );
+
+router.get(
+  "/auth/google/login",
+  passport.authenticate("google", {
+    successRedirect: "/auth/googlelogin",
+    callbackURL: "http://localhost:3000/auth/google/login",
+  })
+);
+
 
 // ! Map to store reset password tokens and their expiration times
 const resetPasswordTokens = new Map();
