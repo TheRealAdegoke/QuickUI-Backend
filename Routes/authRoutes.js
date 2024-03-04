@@ -206,10 +206,10 @@ router.get("/google", passport.authenticate("google", ["profile", "email"]));
 
 
 router.get(
-  "/auth/google/callback",
+  "/auth/google/signup",
   passport.authenticate("google", {
     successRedirect: "/auth/googlesignup",
-    callbackURL: "http://localhost:3000/auth/google/callback",
+    callbackURL: "http://localhost:3000/auth/google/signup",
   })
 );
 
