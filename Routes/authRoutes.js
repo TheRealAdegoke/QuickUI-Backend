@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const nodemailer = require("nodemailer");
+const tokens = require("../middleware/token");
 
 // ! Email validation regex pattern
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,16 +45,30 @@ router.post("/auth/register", async (req, res) => {
 
     await newUser.save();
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "5d",
-    });
+    const { accessToken, refreshToken } = await tokens(newUser._id);
 
     res
-      .status(200)
-      .send({ message: "User registered successfully", token: token });
+      .status(201)
+      .cookie("accessToken", accessToken, {
+        maxAge: 600000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .cookie("refreshToken", refreshToken, {
+        maxAge: 432000000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .send({
+        message: "User registered successfully",
+      });
   } catch (error) {
     console.error("Error Registering user", error);
-    res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error" });
   }
 });
 
@@ -135,11 +150,27 @@ router.post("/auth/login", async (req, res) => {
       return res.status(401).send({ error: "Invalid Password" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "5d",
-    });
+    const { accessToken, refreshToken } = await tokens(user._id);
 
-    res.status(200).send({ message: "Logged In", token: token });
+    res
+      .status(201)
+      .cookie("accessToken", accessToken, {
+        maxAge: 600000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .cookie("refreshToken", refreshToken, {
+        maxAge: 432000000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .send({
+        message: "Logged In",
+      });
   } catch (error) {
     console.error("Error Signing In User", error);
     res.status(500).send({ error: "Internal Server Error" });
@@ -168,15 +199,25 @@ router.get("/auth/googlesignup", async (req, res, next) => {
 
     await newUser.save();
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "5d",
-    });
+    const { accessToken, refreshToken } = await tokens(newUser._id);
 
-    console.log(token);
-
-    res.cookie("token", token)
-
-    return res.redirect("http://localhost:5173/dashboard");
+    res
+      .status(201)
+      .cookie("accessToken", accessToken, {
+        maxAge: 600000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .cookie("refreshToken", refreshToken, {
+        maxAge: 432000000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .redirect("http://localhost:5173/dashboard");
   } catch (error) {
     next(error);
   }
@@ -191,19 +232,31 @@ router.get("/auth/googlelogin", async (req, res, next) => {
       return res.redirect("http://localhost:5173/login?error=invalidUser");
     }
 
-    const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: "5d"})
+    const { accessToken, refreshToken } = await tokens(user._id);
 
-    console.log(token);
-    res.cookie("token", token)
-
-    return res.redirect("http://localhost:5173/dashboard");
+    res
+      .status(201)
+      .cookie("accessToken", accessToken, {
+        maxAge: 600000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .cookie("refreshToken", refreshToken, {
+        maxAge: 432000000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .redirect("http://localhost:5173/dashboard");
   } catch (error) {
     next(error);
   }
 });
 
 router.get("/google", passport.authenticate("google", ["profile", "email"]));
-
 
 router.get(
   "/auth/google/signup",
@@ -221,6 +274,85 @@ router.get(
   })
 );
 
+router.get("/loggedIn", async (req, res) => {
+  try {
+    const {accessToken} = req.cookies
+
+    if (!accessToken) {
+      return res.send(false)
+    }
+
+    jwt.verify(accessToken, process.env.JWT_SECRET);
+    res.send(true)
+  } catch (error) {
+    return res.send(false)
+  }
+})
+
+//periodically check if the user is logged in then generate a new access token.
+router.post("/refresh", async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      return res.status(400).send("Please Login");
+    }
+
+    // Verify the token
+    const verified = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    // Calculate the expiration time of the token
+    const expirationTime = new Date(verified.exp * 1000);
+
+    // Check if the token has expired
+    if (expirationTime <= new Date()) {
+      return res.status(400).send("Your token has expired");
+    }
+
+    // Generate a new access token
+    const { accessToken } = await tokens(verified.user);
+
+    // Set the new access token in the response cookie
+    res
+      .status(200)
+      .cookie("accessToken", accessToken, {
+        maxAge: 600000,
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .send();
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    return res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+
+//log a user out
+router.post("/logout", async (req, res) => {
+  try {
+    res
+      .status(200)
+      .cookie("accessToken", "", {
+        expiresIn: new Date(0),
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .cookie("refreshToken", "", {
+        expiresIn: new Date(0),
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .send({message: "Logged out"});
+  } catch (error) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
 
 // ! Map to store reset password tokens and their expiration times
 const resetPasswordTokens = new Map();
@@ -234,18 +366,24 @@ router.post("/auth/forgotpassword", async (req, res) => {
       return res.status(400).send({ error: "User not found" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET_ACCESS_TOKEN,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     resetPasswordTokens.set(token, {
       userId: user._id,
       expirationTime: Date.now() + 1 * 60 * 60 * 1000, // 1 hour
     });
 
-    sendResetPasswordLink(email, user.fullName, token)
+    sendResetPasswordLink(email, user.fullName, token);
 
-    res.status(200).send({ message: "Reset password link sent ", token: token });
+    res
+      .status(200)
+      .send({ message: "Reset password link sent ", token: token });
   } catch (error) {
     console.error("Error sending reset link", error);
     res.status(500).send({ error: "Internal server error" });
@@ -355,6 +493,5 @@ router.post("/auth/resetpassword", async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 });
-
 
 module.exports = router;
