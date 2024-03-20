@@ -22,7 +22,7 @@ app.use(
       "http://localhost:3000",
       "https://quickui-backend.onrender.com",
       "http://192.168.43.251:5173",
-      "https://quickai-lovat.vercel.app/",
+      "https://quickai-lovat.vercel.app",
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
