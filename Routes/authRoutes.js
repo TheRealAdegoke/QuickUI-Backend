@@ -262,7 +262,7 @@ router.get(
   "/auth/google/signup",
   passport.authenticate("google", {
     successRedirect: "/auth/googlesignup",
-    callbackURL: "http://localhost:3000/auth/google/signup",
+    callbackURL: "https://quickui-backend.onrender.com/auth/google/signup",
   })
 );
 
@@ -270,7 +270,7 @@ router.get(
   "/auth/google/login",
   passport.authenticate("google", {
     successRedirect: "/auth/googlelogin",
-    callbackURL: "http://localhost:3000/auth/google/login",
+    callbackURL: "https://quickui-backend.onrender.com/auth/google/login",
   })
 );
 
