@@ -53,14 +53,14 @@ router.post("/auth/register", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({
@@ -158,14 +158,14 @@ router.post("/auth/login", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({
@@ -207,14 +207,14 @@ router.get("/auth/googlesignup", async (req, res, next) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .redirect("http://localhost:5173/home");
@@ -240,14 +240,14 @@ router.get("/auth/googlelogin", async (req, res, next) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .redirect("http://localhost:5173/home");
@@ -318,7 +318,7 @@ router.post("/refresh", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send();
@@ -337,14 +337,14 @@ router.post("/logout", async (req, res) => {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", "", {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({message: "Logged out"});
