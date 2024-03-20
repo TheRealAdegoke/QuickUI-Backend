@@ -54,14 +54,14 @@ router.post("/auth/register", async (req, res) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .send({
         message: "User registered successfully",
@@ -159,14 +159,14 @@ router.post("/auth/login", async (req, res) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .send({
         message: "Logged In",
@@ -183,7 +183,7 @@ router.get("/auth/googlesignup", async (req, res, next) => {
     let user = await User.findOne({ email: profile.email });
 
     if (user) {
-      return res.redirect("http://localhost:5173/register?error=userExists");
+      return res.redirect("https://quickui-backend.onrender.com/register?error=userExists");
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -208,16 +208,16 @@ router.get("/auth/googlesignup", async (req, res, next) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
-      .redirect("http://localhost:5173/home");
+      .redirect("https://quickui-backend.onrender.com/home");
   } catch (error) {
     next(error);
   }
@@ -229,7 +229,7 @@ router.get("/auth/googlelogin", async (req, res, next) => {
     let user = await User.findOne({ email: profile.email });
 
     if (!user) {
-      return res.redirect("http://localhost:5173/login?error=invalidUser");
+      return res.redirect("https://quickui-backend.onrender.com/login?error=invalidUser");
     }
 
     const { accessToken, refreshToken } = await tokens(user._id);
@@ -241,16 +241,16 @@ router.get("/auth/googlelogin", async (req, res, next) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
-      .redirect("http://localhost:5173/home");
+      .redirect("https://quickui-backend.onrender.com/home");
   } catch (error) {
     next(error);
   }
@@ -319,7 +319,7 @@ router.post("/refresh", async (req, res) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .send();
   } catch (error) {
@@ -338,14 +338,14 @@ router.post("/logout", async (req, res) => {
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .cookie("refreshToken", "", {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
         sameSite: "None",
-        secure: true,
+        secure,
       })
       .send({message: "Logged out"});
   } catch (error) {
@@ -403,7 +403,7 @@ async function sendResetPasswordLink(email, fullName, token) {
       },
     });
 
-    const resetPasswordLink = `http://localhost:5173/resetpassword?token=${token}`;
+    const resetPasswordLink = `https://quickui-backend.onrender.com/resetpassword?token=${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USERNAME,
