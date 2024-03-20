@@ -53,15 +53,15 @@ router.post("/auth/register", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .send({
         message: "User registered successfully",
@@ -158,15 +158,15 @@ router.post("/auth/login", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .send({
         message: "Logged In",
@@ -207,15 +207,15 @@ router.get("/auth/googlesignup", async (req, res, next) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .redirect("https://quickui-backend.onrender.com/home");
   } catch (error) {
@@ -240,15 +240,15 @@ router.get("/auth/googlelogin", async (req, res, next) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .redirect("https://quickui-backend.onrender.com/home");
   } catch (error) {
@@ -318,8 +318,8 @@ router.post("/refresh", async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .send();
   } catch (error) {
@@ -337,15 +337,15 @@ router.post("/logout", async (req, res) => {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .cookie("refreshToken", "", {
         expiresIn: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "None",
-        secure,
+        sameSite: "none",
+        secure: true,
       })
       .send({message: "Logged out"});
   } catch (error) {
