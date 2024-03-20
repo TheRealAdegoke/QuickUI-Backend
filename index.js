@@ -20,6 +20,7 @@ app.use(
       "https://www.google.com",
       "http://localhost:5173",
       "http://localhost:3000",
+      "https://quickui-backend.onrender.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
