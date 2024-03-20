@@ -183,7 +183,9 @@ router.get("/auth/googlesignup", async (req, res, next) => {
     let user = await User.findOne({ email: profile.email });
 
     if (user) {
-      return res.redirect("https://quickui-backend.onrender.com/register?error=userExists");
+      return res.redirect(
+        "https://quickai-lovat.vercel.app/register?error=userExists"
+      );
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -217,7 +219,7 @@ router.get("/auth/googlesignup", async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("https://quickui-backend.onrender.com/home");
+      .redirect("https://quickai-lovat.vercel.app/home");
   } catch (error) {
     next(error);
   }
@@ -229,7 +231,9 @@ router.get("/auth/googlelogin", async (req, res, next) => {
     let user = await User.findOne({ email: profile.email });
 
     if (!user) {
-      return res.redirect("https://quickui-backend.onrender.com/login?error=invalidUser");
+      return res.redirect(
+        "https://quickai-lovat.vercel.app/login?error=invalidUser"
+      );
     }
 
     const { accessToken, refreshToken } = await tokens(user._id);
@@ -250,7 +254,7 @@ router.get("/auth/googlelogin", async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("https://quickui-backend.onrender.com/home");
+      .redirect("https://quickai-lovat.vercel.app/home");
   } catch (error) {
     next(error);
   }
