@@ -217,7 +217,7 @@ router.get("/auth/googlesignup", async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("http://localhost:5173/dashboard");
+      .redirect("http://localhost:5173/home");
   } catch (error) {
     next(error);
   }
@@ -250,7 +250,7 @@ router.get("/auth/googlelogin", async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("http://localhost:5173/dashboard");
+      .redirect("http://localhost:5173/home");
   } catch (error) {
     next(error);
   }
@@ -328,7 +328,6 @@ router.post("/refresh", async (req, res) => {
   }
 });
 
-
 //log a user out
 router.post("/logout", async (req, res) => {
   try {
@@ -354,7 +353,7 @@ router.post("/logout", async (req, res) => {
   }
 });
 
-// ! Map to store reset password tokens and their expiration times
+// Map to store reset password tokens and their expiration times
 const resetPasswordTokens = new Map();
 
 router.post("/auth/forgotpassword", async (req, res) => {
