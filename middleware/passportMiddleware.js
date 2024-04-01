@@ -1,4 +1,6 @@
 const User = require("../Models/User");
+const bcrypt = require("bcrypt");
+const tokens = require("../Utils/token");
 
 const registerWithGoogle = async (req, res, next) => {
   try {
