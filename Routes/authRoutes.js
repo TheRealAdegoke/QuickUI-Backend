@@ -14,14 +14,18 @@ const {
   passportAuthForRegister,
   passportAuthForLogin,
 } = require("../PassportController/passportAuthenticate");
+const {
+  registerWithGoogle,
+  loginWithGoogle,
+} = require("../middleware/passportMiddleware");
 
 router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.get("/googlesignup");
+router.get("/googlesignup", registerWithGoogle);
 
-router.get("/googlelogin");
+router.get("/googlelogin", loginWithGoogle);
 
 router.get("/google", passportAuthForGoogle);
 
