@@ -76,13 +76,9 @@ async function sendWelcomeEmail(email, fullName) {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      host: "smtp.gmail.com",
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
