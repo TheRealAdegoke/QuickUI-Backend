@@ -1,14 +1,19 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const connectDB = async (url) => {
-    try {
-        await mongoose.connect(url, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        });
-    } catch (error) {
-        console.log(error);
-    }
-}
+  try {
+    await mongoose.connect(url);
 
-module.exports = connectDB
+    mongoose.connection.on("connected", () => {
+      console.log("Mongodb Atlas Database Connected...");
+    });
+
+    mongoose.connection.on("error", (err) => {
+      console.error(`MongoDB connection error: ${err}`);
+    });
+  } catch (error) {
+    console.error(`MongoDB connection error: ${error}`);
+  }
+};
+
+module.exports = connectDB;
