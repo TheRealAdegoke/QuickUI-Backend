@@ -4,8 +4,8 @@ const User = require("../Models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const nodemailer = require("nodemailer");
 const tokens = require("../middleware/token");
+const { sendResetPasswordLink, sendWelcomeEmail} = require("../Services/authMailer")
 
 // ! Email validation regex pattern
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -71,55 +71,6 @@ router.post("/auth/register", async (req, res) => {
     return res.status(500).send({ error: "Internal Server Error" });
   }
 });
-
-async function sendWelcomeEmail(email, fullName) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USERNAME,
-      to: email,
-      subject: "Welcome To QuickUI",
-      html: `
-    <div
-      style="
-        font-family: Arial, sans-serif;
-        max-width: 900px;
-        margin: 0 auto;
-        background-color: rgb(240,243,244);
-        padding: 20px;
-      "
-    >
-      <div style="background-color: white; padding: 15px;">
-        <img src="https://res.cloudinary.com/dpyp7innp/image/upload/v1709021630/quick-removebg-preview_z29kwe.png" style="display: block; width: 150px; margin: 0 auto;" alt="QuickUI Logo">
-        <h2 style="color: rgb(68,68,68); margin-top: 10px;">Welcome to QuickUI!</h2>
-        <p style="font-size: 16px; color: rgb(128,128,128);">Hello ${fullName},</p>
-        <p style="font-size: 16px; color: rgb(68,68,68);">We're excited to have you on board!</p>
-        <p style="font-size: 16px; color: rgb(68,68,68);">QuickUI is here to simplify the process of creating stunning web designs. Whether you're an experienced designer or just starting, we've got you covered.</p>
-        <p style="font-size: 16px; color: rgb(68,68,68);">Feel free to explore the powerful features and unleash your creativity with QuickUI.</p>
-        <p style="font-size: 16px; color: rgb(68,68,68);">Happy designing!</p>
-      </div>
-    </div>
-  `,
-    };
-    await transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent");
-      }
-    });
-  } catch (error) {
-    console.error("Error Sending Welcome Email", error);
-    throw new Error("Error sending welcome email");
-  }
-}
 
 router.post("/auth/login", async (req, res) => {
   try {
@@ -388,58 +339,6 @@ router.post("/auth/forgotpassword", async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 });
-
-async function sendResetPasswordLink(email, fullName, token) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    const resetPasswordLink = `https://quickui-backend.onrender.com/resetpassword?token=${token}`;
-
-    const mailOptions = {
-      from: process.env.EMAIL_USERNAME,
-      to: email,
-      subject: "Reset Password",
-      html: `
-    <div
-      style="
-        font-family: Arial, sans-serif;
-        max-width: 900px;
-        margin: 0 auto;
-        background-color: rgb(240,243,244);
-        padding: 20px;
-      "
-    >
-      <div style="background-color: white; padding: 15px;">
-        <img src="https://res.cloudinary.com/dpyp7innp/image/upload/v1709021630/quick-removebg-preview_z29kwe.png" style="display: block; width: 150px; margin: 0 auto;" alt="QuickUI Logo">
-        <h2 style="color: rgb(68,68,68); margin-top: 10px;">Welcome to QuickUI!</h2>
-        <p style="font-size: 16px; color: rgb(128,128,128);">Hello ${fullName},</p>
-        <p style="font-size: 16px; color: rgb(128,128,128)">
-        To reset your password, please click on the link below: <strong style="color: #007BFF;">${resetPasswordLink}</strong> This link will expire in 1 hour.
-      </p>
-      <p style="font-size: 16px; color: rgb(68,68,68); font-weight: 600;">
-        Best regards,<br /><br />QuickUI Team
-      </p>
-      </div>
-    </div>
-  `,
-    };
-
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error("Error sending link", error);
-    throw new Error("Error sending link");
-  }
-}
 
 router.post("/auth/resetpassword", async (req, res) => {
   try {
