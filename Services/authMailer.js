@@ -45,7 +45,8 @@ const sendWelcomeEmail = async (email, fullName) => {
   });
 };
 
-const sendResetPasswordLink = (email, fullName, token) => {
+const sendResetPasswordLink = async (email, fullName, token) => {
+  const resetPasswordLink = `https://quickui-backend.onrender.com/resetpassword?token=${token}`;
     const resetMail = `
     <div
       style="
@@ -69,7 +70,6 @@ const sendResetPasswordLink = (email, fullName, token) => {
       </div>
     </div>
   `;
-    const resetPasswordLink = `https://quickui-backend.onrender.com/resetpassword?token=${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USERNAME,

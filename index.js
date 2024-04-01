@@ -6,7 +6,7 @@ require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-require("./Routes/passportConfig");
+require("./PassportController/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
 
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
 });
 
 // Your other routes
-app.use("/", authRoutes);
+app.use("/api/auth", authRoutes);
 
 const port = 3000;
 
