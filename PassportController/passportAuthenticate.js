@@ -6,12 +6,12 @@ const passportAuthForGoogle = passport.authenticate("google", [
 ]);
 
 const passportAuthForRegister = passport.authenticate("google", {
-  successRedirect: "/api/auth/google/signup",
+  successRedirect: "/api/auth/googlesignup",
   callbackURL: "https://quickui-backend.onrender.com/api/auth/google/signup",
 });
 
 const passportAuthForLogin = passport.authenticate("google", {
-  successRedirect: "/api/auth/google/login",
+  successRedirect: "/api/auth/googlelogin",
   callbackURL: "https://quickui-backend.onrender.com/api/auth/google/login",
 });
 
