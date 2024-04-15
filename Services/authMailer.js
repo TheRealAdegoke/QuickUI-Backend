@@ -46,7 +46,7 @@ const sendWelcomeEmail = async (email, fullName) => {
 };
 
 const sendResetPasswordLink = async (email, fullName, token) => {
-  const resetPasswordLink = `https://quickai-lovat.vercel.app/resetpassword?token=${token}`;
+  const resetPasswordLink = `http://localhost:5173/resetpassword`;
     const resetMail = `
     <div
       style="
