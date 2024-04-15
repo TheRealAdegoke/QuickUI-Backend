@@ -26,7 +26,7 @@ const registerWithGoogle = async (req, res, next) => {
 
     await newUser.save();
 
-    const { accessToken, refreshToken } = await tokens(newUser._id);
+    const { accessToken, refreshToken } = await tokens({ user: newUser._id });
 
     res
       .status(201)
@@ -61,7 +61,7 @@ const loginWithGoogle = async (req, res, next) => {
       );
     }
 
-    const { accessToken, refreshToken } = await tokens(user._id);
+    const { accessToken, refreshToken } = await tokens({ user: user._id });
 
     res
       .status(201)

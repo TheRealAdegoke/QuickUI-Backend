@@ -15,4 +15,8 @@ const passportAuthForLogin = passport.authenticate("google", {
   callbackURL: "https://quickui-backend.onrender.com/api/auth/google/login",
 });
 
-module.exports = {passportAuthForGoogle, passportAuthForRegister, passportAuthForLogin}
+module.exports = {
+  passportAuthForGoogle,
+  passportAuthForRegister,
+  passportAuthForLogin,
+};
