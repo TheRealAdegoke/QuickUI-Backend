@@ -6,8 +6,9 @@ const {
   sendResetPasswordLink,
   sendWelcomeEmail,
 } = require("../Services/authMailer");
+const { authenticate } = require("passport");
 
-// ! Email validation regex pattern
+// ! Email validation regesignx pattern
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const registerUser = async (req, res) => {
@@ -45,7 +46,7 @@ const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    const { accessToken, refreshToken } = await tokens(newUser._id);
+    const { accessToken, refreshToken } = await tokens({ user: newUser._id });
 
     res
       .status(201)
@@ -97,7 +98,7 @@ const loginUser = async (req, res) => {
       return res.status(401).send({ error: "Invalid Password" });
     }
 
-    const { accessToken, refreshToken } = await tokens(user._id);
+    const { accessToken, refreshToken } = await tokens({ user: user._id });
 
     res
       .status(201)
@@ -126,16 +127,16 @@ const loginUser = async (req, res) => {
 
 const authToken = async (req, res) => {
   try {
-    const { accessToken } = req.cookies;
+    const  accessToken = req.cookies.accessToken;
 
     if (!accessToken) {
-      return res.send(false);
+      return res.send({ authenticated: false });
     }
 
     jwt.verify(accessToken, process.env.JWT_SECRET);
-    res.send(true);
+    res.send({ authenticated: true });
   } catch (error) {
-    return res.send(false);
+    return res.send({ authenticated: false, error: error });
   }
 };
 
@@ -184,14 +185,14 @@ const unauthenticateUser = async (req, res) => {
     res
       .status(200)
       .cookie("accessToken", "", {
-        expiresIn: new Date(0),
+        expires: new Date(0),
         httpOnly: true,
         path: "/",
         sameSite: "none",
         secure: true,
       })
       .cookie("refreshToken", "", {
-        expiresIn: new Date(0),
+        expires: new Date(0),
         httpOnly: true,
         path: "/",
         sameSite: "none",
@@ -203,7 +204,6 @@ const unauthenticateUser = async (req, res) => {
   }
 };
 
-// Map to store reset password tokens and their expiration times
 const resetPasswordTokens = new Map();
 
 const forgotpassword = async (req, res) => {
@@ -215,20 +215,16 @@ const forgotpassword = async (req, res) => {
       return res.status(400).send({ error: "User not found" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const { forgotpasswordToken } = tokens({ user: user._id });
 
-    resetPasswordTokens.set(token, {
+    resetPasswordTokens.set(forgotpasswordToken, {
       userId: user._id,
       expirationTime: Date.now() + 1 * 60 * 60 * 1000, // 1 hour
     });
 
-    sendResetPasswordLink(email, user.fullName, token);
+    sendResetPasswordLink(email, user.fullName, forgotpasswordToken);
 
-    res
-      .status(200)
-      .send({ message: "Reset password link sent ", token: token });
+    res.status(200).send({ message: "Reset password link sent " });
   } catch (error) {
     console.error("Error sending reset link", error);
     res.status(500).send({ error: "Internal server error" });
@@ -286,5 +282,8 @@ const resetpassword = async (req, res) => {
     res.status(500).send({ error: "Internal server error" });
   }
 };
+
+
+
 
 module.exports = {registerUser, loginUser, authToken, authRefreshToken, unauthenticateUser, forgotpassword, resetpassword}

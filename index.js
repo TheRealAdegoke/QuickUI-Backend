@@ -10,7 +10,6 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
 const connectDB = require("./Database/connectDB");
-require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
@@ -21,7 +20,6 @@ const authRoutes = require("./Routes/authRoutes");
 app.use(express.json());
 app.use(cookieParser());
 
-// Setup express middleware
 app.use(
   cors({
     origin: [
