@@ -98,7 +98,7 @@ const loginUser = async (req, res) => {
       return res.status(401).send({ error: "Invalid Password" });
     }
 
-    const { accessToken, refreshToken } = await tokens({ user: user._id });
+    const { accessToken, refreshToken } = await tokens(user._id);
 
     res
       .status(201)
@@ -204,7 +204,6 @@ const unauthenticateUser = async (req, res) => {
   }
 };
 
-const resetPasswordTokens = new Map();
 
 const forgotpassword = async (req, res) => {
   try {
@@ -215,71 +214,58 @@ const forgotpassword = async (req, res) => {
       return res.status(400).send({ error: "User not found" });
     }
 
-    const { forgotpasswordToken } = tokens({ user: user._id });
+    // Generate a reset password token
+    const { forgotpasswordToken } = await tokens(user._id);
 
-    resetPasswordTokens.set(forgotpasswordToken, {
-      userId: user._id,
-      expirationTime: Date.now() + 1 * 60 * 60 * 1000, // 1 hour
-    });
+    sendResetPasswordLink(email, user.fullName);
 
-    sendResetPasswordLink(email, user.fullName, forgotpasswordToken);
-
-    res.status(200).send({ message: "Reset password link sent " });
+    res
+      .status(200)
+      .cookie("resetToken", forgotpasswordToken, {
+        maxAge: 3600000, // 1 hour expiration time
+        httpOnly: true,
+        path: "/",
+        sameSite: "none",
+        secure: true,
+      })
+      .send({ message: "Reset password link sent to your email" });
   } catch (error) {
-    console.error("Error sending reset link", error);
-    res.status(500).send({ error: "Internal server error" });
+    console.error("Error sending reset password link:", error);
+    res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
 const resetpassword = async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { password } = req.body;
+    const resetToken = req.cookies.resetToken;
 
-    // ! Check if the token and new password are provided
-    if (!token) {
-      return res.status(400).send({ error: "Token is required" });
+    // Check if reset token exists
+    if (!resetToken) {
+      return res.status(400).send({ error: "Reset token not found" });
     }
 
-    if (!password) {
-      return res.status(400).send({ error: "Password is required" });
-    }
+    // Verify the reset token
+    const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
 
-    // ! Check if the token is valid and not expired
-    const resetTokenData = resetPasswordTokens.get(token);
-    if (!resetTokenData || Date.now() > resetTokenData.expirationTime) {
-      resetPasswordTokens.delete(token);
-      return res.status(400).send({ error: "Invalid or expired token" });
-    }
-
-    // ! Find the user by userId
-    const user = await User.findById(resetTokenData.userId);
-
-    // ! Check if the user exists
+    // Update user's password
+    const user = await User.findById(decoded.user);
     if (!user) {
-      return res.status(404).send({ error: "User not found" });
+      return res.status(400).send({ error: "User not found" });
     }
 
-    // ! Check if the password is at least 6 characters long
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .send({ error: "Password should be at least 6 characters long" });
-    }
-
-    // ! Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // ! Update the user's password
-    user.password = hashedPassword;
+    // Update user's password with the new one
+    user.password = await bcrypt.hash(password, 10);
     await user.save();
 
-    // ! Remove the reset password token from the map
-    resetPasswordTokens.delete(token);
+    // Clear reset token cookie
+    res.clearCookie("resetToken", { path: "/" });
 
-    res.status(200).send({ message: "Password reset successfully" });
+    // Send response
+    res.status(200).send({ message: "Password reset successful" });
   } catch (error) {
     console.error("Error resetting password:", error);
-    res.status(500).send({ error: "Internal server error" });
+    res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
