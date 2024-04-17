@@ -9,7 +9,7 @@ const registerWithGoogle = async (req, res, next) => {
 
     if (user) {
       return res.redirect(
-        "https://quickai-lovat.vercel.app/register?error=userExists"
+        `${process.env.CORS_VERCEL_FRONTEND}/register?error=userExists`
       );
     }
 
@@ -26,7 +26,7 @@ const registerWithGoogle = async (req, res, next) => {
 
     await newUser.save();
 
-    const { accessToken, refreshToken } = await tokens({ user: newUser._id });
+    const { accessToken, refreshToken } = await tokens(newUser._id);
 
     res
       .status(201)
@@ -44,7 +44,7 @@ const registerWithGoogle = async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("https://quickai-lovat.vercel.app/home");
+      .redirect(`${process.env.CORS_VERCEL_FRONTEND}/home`);
   } catch (error) {
     next(error);
   }
@@ -57,11 +57,11 @@ const loginWithGoogle = async (req, res, next) => {
 
     if (!user) {
       return res.redirect(
-        "https://quickai-lovat.vercel.app/login?error=invalidUser"
+        `${process.env.CORS_VERCEL_FRONTEND}/login?error=invalidUser`
       );
     }
 
-    const { accessToken, refreshToken } = await tokens({ user: user._id });
+    const { accessToken, refreshToken } = await tokens(user._id);
 
     res
       .status(201)
@@ -79,10 +79,10 @@ const loginWithGoogle = async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .redirect("https://quickai-lovat.vercel.app/home");
+      .redirect(`${process.env.CORS_VERCEL_FRONTEND}/home`);
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = {registerWithGoogle, loginWithGoogle}
+module.exports = { registerWithGoogle, loginWithGoogle };
