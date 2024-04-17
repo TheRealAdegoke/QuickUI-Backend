@@ -13,7 +13,7 @@ const connectDB = require("./Database/connectDB");
 const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
-require("./PassportController/passportConfig");
+require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
 

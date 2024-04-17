@@ -8,6 +8,7 @@ const {
   unauthenticateUser,
   forgotpassword,
   resetpassword,
+  userData,
 } = require("../Controller/authController");
 const {
   passportAuthForGoogle,
@@ -42,5 +43,7 @@ router.post("/logout", unauthenticateUser);
 router.post("/forgotpassword", forgotpassword);
 
 router.post("/resetpassword", resetpassword);
+
+router.get("/user-data", userData)
 
 module.exports = router;

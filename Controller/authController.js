@@ -127,7 +127,7 @@ const loginUser = async (req, res) => {
 
 const authToken = async (req, res) => {
   try {
-    const  accessToken = req.cookies.accessToken;
+    const accessToken = req.cookies.accessToken;
 
     if (!accessToken) {
       return res.send({ authenticated: false });
@@ -204,7 +204,6 @@ const unauthenticateUser = async (req, res) => {
   }
 };
 
-
 const forgotpassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -269,7 +268,39 @@ const resetpassword = async (req, res) => {
   }
 };
 
+const userData = async (req, res) => {
+  try {
+    const accessToken = req.cookies.accessToken;
 
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
+    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const user = verified.user;
+    const getUserData = await User.findById(user);
 
-module.exports = {registerUser, loginUser, authToken, authRefreshToken, unauthenticateUser, forgotpassword, resetpassword}
+    if (!user) {
+      return res.status(400).send({ error: "Invalid User" });
+    }
+
+    return res.status(200).json({
+      fullname: getUserData.fullName,
+      email: getUserData.email,
+    });
+  } catch (error) {
+    console.error("error: ", error);
+    res.status(500).send({ "Internal Server Error: ": error });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  authToken,
+  authRefreshToken,
+  unauthenticateUser,
+  forgotpassword,
+  resetpassword,
+  userData,
+};
