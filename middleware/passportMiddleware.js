@@ -79,6 +79,7 @@ const loginWithGoogle = async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
+      .redirect("https://quickai-lovat.vercel.app/home");
   } catch (error) {
     next(error);
   }
