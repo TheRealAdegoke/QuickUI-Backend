@@ -6,7 +6,6 @@ const {
   sendResetPasswordLink,
   sendWelcomeEmail,
 } = require("../Services/authMailer");
-const { authenticate } = require("passport");
 
 // ! Email validation regesignx pattern
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

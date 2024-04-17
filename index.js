@@ -23,12 +23,12 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "https://www.google.com",
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://quickui-backend.onrender.com",
-      "http://192.168.43.251:5173",
-      "https://quickai-lovat.vercel.app",
+      process.env.CORS_GOOGLE,
+      process.env.CORS_VITE_LOCAL_HOST,
+      process.env.CORS_NODE_LOCAL_HOST,
+      process.env.CORS_RENDER,
+      process.env.CORS_VITE_LOCAL_HOST_SUB_DOMAIN,
+      process.env.CORS_VERCEL_FRONTEND,
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
@@ -60,7 +60,7 @@ const port = 3000;
 
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI);
+    await connectDB(process.env.MONGO_URL);
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}...`);
     });
