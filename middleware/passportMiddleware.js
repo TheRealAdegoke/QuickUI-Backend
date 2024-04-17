@@ -79,7 +79,6 @@ const loginWithGoogle = async (req, res, next) => {
         sameSite: "none",
         secure: true,
       })
-      .send({message: "logged in"});
   } catch (error) {
     next(error);
   }
