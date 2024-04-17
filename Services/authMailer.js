@@ -45,8 +45,8 @@ const sendWelcomeEmail = async (email, fullName) => {
   });
 };
 
-const sendResetPasswordLink = async (email, fullName, token) => {
-  const resetPasswordLink = `http://localhost:5173/resetpassword`;
+const sendResetPasswordLink = async (email, fullName) => {
+  const resetPasswordLink = `${process.env.CORS_VERCEL_FRONTEND}/resetpassword`;
     const resetMail = `
     <div
       style="

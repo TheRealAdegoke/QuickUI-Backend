@@ -7,12 +7,12 @@ const passportAuthForGoogle = passport.authenticate("google", [
 
 const passportAuthForRegister = passport.authenticate("google", {
   successRedirect: "/api/auth/googlesignup",
-  callbackURL: "https://quickui-backend.onrender.com/api/auth/google/signup",
+  callbackURL: `${process.env.CORS_RENDER}/api/auth/google/signup`,
 });
 
 const passportAuthForLogin = passport.authenticate("google", {
   successRedirect: "/api/auth/googlelogin",
-  callbackURL: "https://quickui-backend.onrender.com/api/auth/google/login",
+  callbackURL: `${process.env.CORS_RENDER}/api/auth/google/login`,
 });
 
 module.exports = {
