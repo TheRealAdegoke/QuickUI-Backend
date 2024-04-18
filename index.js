@@ -16,6 +16,7 @@ const passport = require("passport");
 require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
+const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
 
 app.use(express.json());
 app.use(cookieParser());
@@ -55,6 +56,7 @@ app.get("/", (req, res) => {
 
 // Your other routes
 app.use("/api/auth", authRoutes);
+app.use("/api", thirdPartiesRoutes);
 
 const port = 3000;
 
