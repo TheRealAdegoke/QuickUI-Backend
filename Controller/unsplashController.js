@@ -3,12 +3,17 @@ const axios = require("axios");
 const searchImages = async (req, res) => {
   try {
     const { prompt } = req.body;
-    const IMAGES_PER_PAGE = 10;
 
     if (prompt.trim() === "") {
       return res.status(400).send({
         error: "Empty Prompt",
       });
+    }
+
+    if (prompt.length < 5) {
+      return res
+        .status(400)
+        .send({ error: "Prompt should contain at least 5 words" });
     }
 
     // Fetch images from Unsplash API
