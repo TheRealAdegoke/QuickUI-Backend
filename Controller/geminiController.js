@@ -22,7 +22,7 @@ const geminiChatHeroSectionHeader = async (req, res) => {
       const promptResponse = await runChat(promptPrefix + " " + prompt);
 
       // Send the response back to the client
-      res.json({ promptResponse });
+      res.status(200).json({ promptResponse });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -53,7 +53,7 @@ const geminiChatHeroSectionDescription = async (req, res) => {
     const promptResponse = await runChat(promptPrefix + " " + prompt);
 
     // Send the response back to the client
-    res.json({ promptResponse });
+    res.status(200).json({ promptResponse });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
