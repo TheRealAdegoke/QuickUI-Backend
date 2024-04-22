@@ -1,13 +1,7 @@
 const express = require("express")
 const router = express.Router();
-const {
-  geminiChatHeroSectionHeader,
-  geminiChatHeroSectionDescription,
-} = require("../Controller/geminiController");
-const searchImages = require("../Controller/unsplashController");
+const { geminiChatResponses } = require("../Controller/geminiController");
 
-router.post("/gemini-chat-hero-section-header", geminiChatHeroSectionHeader);
-router.post("/gemini-chat-hero-section-description", geminiChatHeroSectionDescription);
-router.post("/search-image", searchImages);
+router.post("/gemini-chat-responses", geminiChatResponses);
 
 module.exports = router
