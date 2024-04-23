@@ -27,6 +27,10 @@ const geminiChatResponses = async (req, res) => {
       return res.status(404).send({ error: error.message });
     }
 
+    const promptResponseForLogo = await runChat(
+      prefixForPrompts.promptPrefixLogo + " " + prompt
+    );
+
     const promptResponseForHeroHeader = await runChat(
       prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
     );
@@ -36,6 +40,7 @@ const geminiChatResponses = async (req, res) => {
     );
 
     res.status(200).json({
+      logo: promptResponseForLogo,
       heroHeader: promptResponseForHeroHeader,
       heroDescription: promptResponseForHeroDescription,
       imageUrls: imageUrlsResponse.imageUrls,
