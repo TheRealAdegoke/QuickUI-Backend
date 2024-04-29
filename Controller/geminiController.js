@@ -1,5 +1,5 @@
 const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
-const prefixForPrompts = require("../Utils/prefixObjects");
+const { prefixForPrompts, randomButtonText } = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
 
 const geminiChatResponses = async (req, res) => {
@@ -40,6 +40,7 @@ const geminiChatResponses = async (req, res) => {
     );
 
     res.status(200).json({
+      randomButtonText: randomButtonText,
       logo: promptResponseForLogo,
       heroHeader: promptResponseForHeroHeader,
       heroDescription: promptResponseForHeroDescription,
