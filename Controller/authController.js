@@ -286,6 +286,7 @@ const userData = async (req, res) => {
     return res.status(200).json({
       fullname: getUserData.fullName,
       email: getUserData.email,
+      history: getUserData.promptHistory
     });
   } catch (error) {
     console.error("error: ", error);
