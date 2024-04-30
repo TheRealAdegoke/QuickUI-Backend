@@ -12,6 +12,10 @@ const geminiChatResponses = async (req, res) => {
     const { prompt } = req.body;
     const accessToken = req.cookies.accessToken;
 
+    if (!accessToken) {
+      return res.status(400).send({ error: "Please Login" });
+    }
+
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const user = verified.user;
     const getUserData = await User.findById(user);
