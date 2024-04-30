@@ -1,10 +1,24 @@
+const User = require("../Models/User");
+const jwt = require("jsonwebtoken");
 const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
-const { prefixForPrompts, randomButtonText } = require("../Utils/prefixObjects");
+const {
+  prefixForPrompts,
+  randomButtonText,
+} = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
 
 const geminiChatResponses = async (req, res) => {
   try {
     const { prompt } = req.body;
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(400).send({ error: "Please Login" });
+    }
+
+    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const user = verified.user;
+    const getUserData = await User.findById(user);
 
     if (prompt.trim() === "") {
       return res.status(400).send({
@@ -17,6 +31,12 @@ const geminiChatResponses = async (req, res) => {
         .status(400)
         .send({ error: "Prompt should contain at least 5 words" });
     }
+
+    getUserData.promptHistory.push({
+      prompt,
+      createdAt: new Date(),
+    });
+    await getUserData.save();
 
     // Call searchImages function with the prompt
     let imageUrlsResponse;

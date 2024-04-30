@@ -36,6 +36,8 @@ const randomButtonText = [
   "Book Now",
   "Take Action",
   "Visit Us",
+  "Pricing",
+  "Features"
 ];
 
 module.exports = { prefixForPrompts, randomButtonText };
