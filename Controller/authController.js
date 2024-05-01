@@ -45,7 +45,7 @@ const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    const { accessToken, refreshToken } = await tokens({ user: newUser._id });
+    const { accessToken, refreshToken } = await tokens(newUser._id);
 
     res
       .status(201)
