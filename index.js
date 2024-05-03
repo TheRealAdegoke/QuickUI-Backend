@@ -49,12 +49,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Your routes
 app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-// Your other routes
 app.use("/api/auth", authRoutes);
 app.use("/api", thirdPartiesRoutes);
 
