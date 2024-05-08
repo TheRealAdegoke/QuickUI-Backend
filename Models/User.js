@@ -19,7 +19,22 @@ const userSchema = new Schema({
     {
       prompt: {
         type: String,
-        required: true,
+      },
+      navStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      heroStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
       },
       createdAt: {
         type: Date,
