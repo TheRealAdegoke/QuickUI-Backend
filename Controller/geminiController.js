@@ -16,10 +16,6 @@ const geminiChatResponses = async (req, res) => {
       return res.status(400).send({ error: "Please Login" });
     }
 
-    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const user = verified.user;
-    const getUserData = await User.findById(user);
-
     if (prompt.trim() === "") {
       return res.status(400).send({
         error: "Empty Prompt",
@@ -31,12 +27,6 @@ const geminiChatResponses = async (req, res) => {
         .status(400)
         .send({ error: "Prompt should contain at least 5 words" });
     }
-
-    getUserData.promptHistory.push({
-      prompt,
-      createdAt: new Date(),
-    });
-    await getUserData.save();
 
     // Call searchImages function with the prompt
     let imageUrlsResponse;
@@ -72,6 +62,42 @@ const geminiChatResponses = async (req, res) => {
   }
 };
 
+const landingPageDesign = async (req, res) => {
+  try {
+    const { prompt, navStyle, heroStyle } = req.body;
+
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(400).send({ error: "Please Login" });
+    }
+
+    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const user = verified.user;
+    const getUserData = await User.findById(user);
+
+    if (prompt.trim() === "") {
+      return res.status(400).send({
+        error: "Empty Prompt",
+      });
+    }
+
+    getUserData.promptHistory.push({
+      prompt,
+      navStyle, 
+      heroStyle,
+      createdAt: new Date(),
+    });
+    await getUserData.save();
+    
+    res.status(200).send({ message: "saved" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 module.exports = {
   geminiChatResponses,
+  landingPageDesign
 };
