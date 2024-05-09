@@ -36,6 +36,9 @@ const userSchema = new Schema({
           type: String,
         },
       },
+      webDesignImagePreview: {
+        type: String,
+      },
       createdAt: {
         type: Date,
         default: Date.now,
