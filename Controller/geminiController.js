@@ -86,6 +86,7 @@ const landingPageDesign = async (req, res) => {
       prompt,
       navStyle, 
       heroStyle,
+      webDesignImagePreview,
       createdAt: new Date(),
     });
     await getUserData.save();
