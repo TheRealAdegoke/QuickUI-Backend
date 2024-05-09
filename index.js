@@ -21,13 +21,6 @@ const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/images", (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  next();
-});
-
-app.use("/images", express.static("images"));
-
 app.use(
   cors({
     origin: [
