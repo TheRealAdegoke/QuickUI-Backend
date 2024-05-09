@@ -64,7 +64,7 @@ const geminiChatResponses = async (req, res) => {
 
 const landingPageDesign = async (req, res) => {
   try {
-    const { prompt, navStyle, heroStyle } = req.body;
+    const { prompt, navStyle, heroStyle, webDesignImagePreview } = req.body;
 
     const accessToken = req.cookies.accessToken;
 
@@ -84,19 +84,20 @@ const landingPageDesign = async (req, res) => {
 
     getUserData.promptHistory.push({
       prompt,
-      navStyle, 
+      navStyle,
       heroStyle,
       webDesignImagePreview,
       createdAt: new Date(),
     });
     await getUserData.save();
-    
+
     res.status(200).send({ message: "saved" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
+
 
 module.exports = {
   geminiChatResponses,
