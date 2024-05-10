@@ -294,6 +294,40 @@ const userData = async (req, res) => {
   }
 };
 
+const getPromptHistoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
+
+    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const user = verified.user;
+    const getUserData = await User.findById(user);
+
+    if (!getUserData) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the promptHistory item by its _id
+    const promptHistoryItem = getUserData.promptHistory.find(
+      (item) => item._id.toString() === id
+    );
+
+    if (!promptHistoryItem) {
+      return res.status(404).json({ error: "Prompt history item not found" });
+    }
+
+    // Return the promptHistory item
+    return res.status(200).json(promptHistoryItem);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -303,4 +337,5 @@ module.exports = {
   forgotpassword,
   resetpassword,
   userData,
+  getPromptHistoryById
 };
