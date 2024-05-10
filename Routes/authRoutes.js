@@ -9,6 +9,7 @@ const {
   forgotpassword,
   resetpassword,
   userData,
+  getPromptHistoryById,
 } = require("../Controller/authController");
 const {
   passportAuthForGoogle,
@@ -45,5 +46,7 @@ router.post("/forgotpassword", forgotpassword);
 router.post("/resetpassword", resetpassword);
 
 router.get("/user-data", userData)
+
+router.get("/user-data/:id", getPromptHistoryById);
 
 module.exports = router;
