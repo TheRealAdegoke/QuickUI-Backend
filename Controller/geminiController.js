@@ -6,6 +6,7 @@ const {
   randomButtonText,
 } = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
+const { runChatBackup } = require("../ThirdPartiesAPI/GeminiAPI/geminiapibackup");
 
 const geminiChatResponses = async (req, res) => {
   try {
@@ -37,30 +38,80 @@ const geminiChatResponses = async (req, res) => {
       return res.status(404).send({ error: error.message });
     }
 
-    const promptResponseForLogo = await runChat(
-      prefixForPrompts.promptPrefixLogo + " " + prompt
-    );
+    let promptResponseForLogo,
+      promptResponseForHeroHeader,
+      promptResponsesForDescription = [],
+      promptResponsesForSectionHeaders = [];
 
-    const promptResponseForHeroHeader = await runChat(
-      prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
-    );
+    try {
+      promptResponseForLogo = await runChat(
+        prefixForPrompts.promptPrefixLogo + " " + prompt
+      );
+    } catch (error) {
+      console.error("Error generating logo:", error);
+      promptResponseForLogo = "Default logo text"; // Fallback response
+    }
 
-    const promptResponseForHeroDescription = await runChat(
-      prefixForPrompts.promptPrefixForHeroDescription + " " + prompt
-    );
+    try {
+      promptResponseForHeroHeader = await runChat(
+        prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
+      );
+    } catch (error) {
+      if (error.message.includes("500 Internal Server Error")) {
+        console.error("Rate limit error for hero header:", error);
+        promptResponseForHeroHeader = "Your header Text"; // Fallback response for rate limit error
+      } else {
+        throw error; // Rethrow if it's not the rate limit error
+      }
+    }
+
+    // Generate multiple hero descriptions
+    const numberOfDescriptions = 12;
+    for (let i = 0; i < numberOfDescriptions; i++) {
+      try {
+        const response = await runChatBackup(
+          prefixForPrompts.promptPrefixForDescription + " " + prompt
+        );
+        promptResponsesForDescription.push(response);
+      } catch (error) {
+        console.error("Error generating hero description:", error);
+        promptResponsesForDescription.push(
+          "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum labore iure hic nemo ipsam totam veritatis provident et aut quae?"
+        ); // Fallback response
+      }
+    }
+
+    // Generate multiple hero descriptions
+    // const numberOfSectionHeaders = 5;
+    // for (let i = 0; i < numberOfSectionHeaders; i++) {
+    //   try {
+    //     const response = await runChat(
+    //       prefixForPrompts.promptPrefixForSectionHeader + " " + prompt
+    //     );
+    //     promptResponsesForSectionHeaders.push(response);
+    //   } catch (error) {
+    //     console.error("Error generating hero description:", error);
+    //     promptResponsesForSectionHeaders.push(
+    //       "Your Amazing Feature Goes Here",
+    //     ); // Fallback response
+    //   }
+    // }
 
     res.status(200).json({
-      randomButtonText: randomButtonText,
-      logo: promptResponseForLogo,
-      heroHeader: promptResponseForHeroHeader,
-      heroDescription: promptResponseForHeroDescription,
-      imageUrls: imageUrlsResponse.imageUrls,
+      // randomButtonText: randomButtonText,
+      // logo: promptResponseForLogo,
+      headers: promptResponseForHeroHeader,
+      descriptions: promptResponsesForDescription,
+      // sectionHeader: promptResponsesForSectionHeaders,
+      // imageUrls: imageUrlsResponse.imageUrls,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
 
 const landingPageDesign = async (req, res) => {
   try {
