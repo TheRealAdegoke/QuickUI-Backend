@@ -1,11 +1,10 @@
 const prefixForPrompts = {
-  promptPrefixLogo: "In just one word describe a good company name for",
+  promptPrefixLogo:
+    "In just one word describe a good company name for",
   promptPrefixForHeroHeader:
     "Write a short header not less than 3 words and not more than 4 words without any special characters it must be 4 words for a hero section for",
-  promptPrefixForDescription:
+  promptPrefixForHeroDescription:
     "Write a short description not less than 25 words and not more than 30 words without any special characters for a website",
-  promptPrefixForSectionHeader:
-    "Write a short header not less than 2 words and not more than 3 words without any special characters it must be 4 words for a feature section for",
 };
 
 const randomButtonText = [
