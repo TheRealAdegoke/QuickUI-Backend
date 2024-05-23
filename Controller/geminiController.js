@@ -37,28 +37,91 @@ const geminiChatResponses = async (req, res) => {
       return res.status(404).send({ error: error.message });
     }
 
-    const promptResponseForLogo = await runChat(
-      prefixForPrompts.promptPrefixLogo + " " + prompt
-    );
+    let promptResponseForLogo,
+      promptResponseForHeroHeader,
+      promptResponseForHeroDescription;
 
-    const promptResponseForHeroHeader = await runChat(
-      prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
-    );
+    try {
+      promptResponseForLogo = await runChat(
+        prefixForPrompts.promptPrefixLogo + " " + prompt
+      );
+    } catch (error) {
+      console.error("Error generating logo:", error);
+      promptResponseForLogo = "QuickUI"; // Fallback response
+    }
 
-    const promptResponseForHeroDescription = await runChat(
-      prefixForPrompts.promptPrefixForHeroDescription + " " + prompt
-    );
+    try {
+      promptResponseForHeroHeader = await runChat(
+        prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
+      );
+    } catch (error) {
+      if (error.message.includes("500 Internal Server Error")) {
+        console.error("Rate limit error for hero header:", error);
+        promptResponseForHeroHeader = "Quick Design With QuickUI"; // Fallback response for rate limit error
+      } else {
+        throw error;
+      }
+    }
+
+    try {
+      promptResponseForHeroDescription = await runChat(
+        prefixForPrompts.promptPrefixForHeroDescription + " " + prompt
+      );
+    } catch (error) {
+      console.error("Error generating hero description:", error);
+      promptResponseForHeroDescription =
+        "Tell your visitors more about what you do and why they should chose you."; // Fallback response
+    }
+
+    const faqHeaders = [];
+    const faqAnswers = [];
+    const fallbackFAQHeaders = [
+      "Question 1",
+      "Question 2",
+      "Question 3",
+      "Question 4",
+    ];
+
+    for (let i = 0; i < 4; i++) {
+      let faqHeader, faqAnswer;
+
+      try {
+        faqHeader = await runChat(
+          prefixForPrompts.promptPrefixForFAQHeader + " " + prompt
+        );
+        faqHeaders.push(faqHeader);
+      } catch (error) {
+        console.error("Error generating FAQ header:", error);
+        faqHeaders.push(fallbackFAQHeaders[i]); // Fallback response
+      }
+
+      try {
+        faqAnswer = await runChat(
+          prefixForPrompts.promptPrefixForFAQAnswer + " " + faqHeader
+        );
+        faqAnswers.push(faqAnswer);
+      } catch (error) {
+        console.error("Error generating FAQ answer:", error);
+        faqAnswers.push(
+          "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa."
+        ); // Fallback response
+      }
+    }
 
     res.status(200).json({
       randomButtonText: randomButtonText,
       logo: promptResponseForLogo,
       heroHeader: promptResponseForHeroHeader,
       heroDescription: promptResponseForHeroDescription,
+      faqHeaders: faqHeaders,
+      faqAnswers: faqAnswers,
       imageUrls: imageUrlsResponse.imageUrls,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).send({
+      error: "QuickAI is at capacity, Default contents will be generated",
+    });
   }
 };
 
@@ -98,8 +161,7 @@ const landingPageDesign = async (req, res) => {
   }
 };
 
-
 module.exports = {
   geminiChatResponses,
-  landingPageDesign
+  landingPageDesign,
 };
