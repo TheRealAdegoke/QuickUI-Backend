@@ -82,6 +82,7 @@ const geminiChatResponses = async (req, res) => {
       "Question 4",
     ];
 
+
     for (let i = 0; i < 4; i++) {
       let faqHeader, faqAnswer;
 
@@ -92,6 +93,7 @@ const geminiChatResponses = async (req, res) => {
         faqHeaders.push(faqHeader);
       } catch (error) {
         console.error("Error generating FAQ header:", error);
+        res.status(500).send({error: "QuickAI is at capacity, Default contents will be generated"})
         faqHeaders.push(fallbackFAQHeaders[i]); // Fallback response
       }
 
@@ -119,11 +121,10 @@ const geminiChatResponses = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send({
-      error: "QuickAI is at capacity, Default contents will be generated",
-    });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 const landingPageDesign = async (req, res) => {
   try {
