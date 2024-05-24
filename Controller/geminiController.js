@@ -31,7 +31,10 @@ const handleAPIError = async (prompt, prefix, index = null) => {
   try {
     return await runChat(prefix + " " + prompt);
   } catch (error) {
-    if (error.message.includes("429 Too Many Requests")) {
+    if (
+      error.message.includes("429 Too Many Requests") ||
+      error.message.includes("503 Service Unavailable")
+    ) {
       // Return dummy text if rate limit is hit
       switch (prefix) {
         case prefixForPrompts.promptPrefixLogo:
