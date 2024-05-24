@@ -4,8 +4,58 @@ const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
 const {
   prefixForPrompts,
   randomButtonText,
+  FAQsHeader,
+  teamHeader,
+  featureHeader,
+  contactHeader,
+  customerHeader,
+  statsHeader,
+  partnerHeader,
+  customerParagraphText,
+  teamParagraphText,
+  faqParagraphText,
+  customerReviewText,
 } = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
+
+const dummyResponses = {
+  logo: "QuickUI",
+  heroHeader: "Quickly Design with QuickUI",
+  heroDescription: "Lorem ipsum",
+  faqQuestions: ["Question 1", "Question 2", "Question 3", "Question 4"],
+  faqAnswers:
+    "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
+};
+
+const handleAPIError = async (prompt, prefix, index = null) => {
+  try {
+    return await runChat(prefix + " " + prompt);
+  } catch (error) {
+    if (error.message.includes("429 Too Many Requests")) {
+      // Return dummy text if rate limit is hit
+      switch (prefix) {
+        case prefixForPrompts.promptPrefixLogo:
+          return dummyResponses.logo;
+        case prefixForPrompts.promptPrefixForHeroHeader:
+          return dummyResponses.heroHeader;
+        case prefixForPrompts.promptPrefixForHeroDescription:
+          return dummyResponses.heroDescription;
+        case prefixForPrompts.promptPrefixForFaqQuestion:
+          if (index !== null && index < dummyResponses.faqQuestions.length) {
+            return dummyResponses.faqQuestions[index];
+          } else {
+            return dummyResponses.faqQuestions[0];
+          }
+        case prefixForPrompts.promptPrefixForFAQAnswer:
+          return dummyResponses.faqAnswers;
+        default:
+          throw new Error("Unknown prefix");
+      }
+    } else {
+      throw error; // Re-throw the error if it's not a rate limit error
+    }
+  }
+};
 
 const geminiChatResponses = async (req, res) => {
   try {
@@ -37,77 +87,35 @@ const geminiChatResponses = async (req, res) => {
       return res.status(404).send({ error: error.message });
     }
 
-    let promptResponseForLogo,
-      promptResponseForHeroHeader,
-      promptResponseForHeroDescription;
+    const promptResponseForLogo = await handleAPIError(
+      prompt,
+      prefixForPrompts.promptPrefixLogo
+    );
 
-    try {
-      promptResponseForLogo = await runChat(
-        prefixForPrompts.promptPrefixLogo + " " + prompt
-      );
-    } catch (error) {
-      console.error("Error generating logo:", error);
-      promptResponseForLogo = "QuickUI"; // Fallback response
-    }
+    const promptResponseForHeroHeader = await handleAPIError(
+      prompt,
+      prefixForPrompts.promptPrefixForHeroHeader
+    );
 
-    try {
-      promptResponseForHeroHeader = await runChat(
-        prefixForPrompts.promptPrefixForHeroHeader + " " + prompt
-      );
-    } catch (error) {
-      if (error.message.includes("500 Internal Server Error")) {
-        console.error("Rate limit error for hero header:", error);
-        promptResponseForHeroHeader = "Quick Design With QuickUI"; // Fallback response for rate limit error
-      } else {
-        throw error;
-      }
-    }
+    const promptResponseForHeroDescription = await handleAPIError(
+      prompt,
+      prefixForPrompts.promptPrefixForHeroDescription
+    );
 
-    try {
-      promptResponseForHeroDescription = await runChat(
-        prefixForPrompts.promptPrefixForHeroDescription + " " + prompt
-      );
-    } catch (error) {
-      console.error("Error generating hero description:", error);
-      promptResponseForHeroDescription =
-        "Tell your visitors more about what you do and why they should chose you."; // Fallback response
-    }
-
-    const faqHeaders = [];
+    const faqQuestions = [];
     const faqAnswers = [];
-    const fallbackFAQHeaders = [
-      "Question 1",
-      "Question 2",
-      "Question 3",
-      "Question 4",
-    ];
-
 
     for (let i = 0; i < 4; i++) {
-      let faqHeader, faqAnswer;
-
-      try {
-        faqHeader = await runChat(
-          prefixForPrompts.promptPrefixForFAQHeader + " " + prompt
-        );
-        faqHeaders.push(faqHeader);
-      } catch (error) {
-        console.error("Error generating FAQ header:", error);
-        res.status(500).send({error: "QuickAI is at capacity, Default contents will be generated"})
-        faqHeaders.push(fallbackFAQHeaders[i]); // Fallback response
-      }
-
-      try {
-        faqAnswer = await runChat(
-          prefixForPrompts.promptPrefixForFAQAnswer + " " + faqHeader
-        );
-        faqAnswers.push(faqAnswer);
-      } catch (error) {
-        console.error("Error generating FAQ answer:", error);
-        faqAnswers.push(
-          "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa."
-        ); // Fallback response
-      }
+      const faqQuestion = await handleAPIError(
+        prompt,
+        prefixForPrompts.promptPrefixForFaqQuestion
+      );
+      const faqAnswer = await handleAPIError(
+        faqQuestion,
+        prefixForPrompts.promptPrefixForFAQAnswer
+      );
+      faqQuestions.push(faqQuestion);
+      faqAnswers.push(faqAnswer);
     }
 
     res.status(200).json({
@@ -115,8 +123,19 @@ const geminiChatResponses = async (req, res) => {
       logo: promptResponseForLogo,
       heroHeader: promptResponseForHeroHeader,
       heroDescription: promptResponseForHeroDescription,
-      faqHeaders: faqHeaders,
+      featureHeaders: featureHeader,
+      customerHeaders: customerHeader,
+      customerParagraphTexts: customerParagraphText,
+      customerReviewTexts: customerReviewText,
+      teamHeaders: teamHeader,
+      teamParagraphTexts: teamParagraphText,
+      FAQsHeaders: FAQsHeader,
+      faqParagraphTexts: faqParagraphText,
+      faqQuestions: faqQuestions,
       faqAnswers: faqAnswers,
+      statsHeaders:statsHeader,
+      partnerHeaders: partnerHeader,
+      contactHeaders: contactHeader,
       imageUrls: imageUrlsResponse.imageUrls,
     });
   } catch (error) {
@@ -124,7 +143,6 @@ const geminiChatResponses = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const landingPageDesign = async (req, res) => {
   try {
