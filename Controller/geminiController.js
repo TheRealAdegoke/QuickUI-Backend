@@ -149,7 +149,19 @@ const geminiChatResponses = async (req, res) => {
 
 const landingPageDesign = async (req, res) => {
   try {
-    const { prompt, navStyle, heroStyle, webDesignImagePreview } = req.body;
+    const {
+      prompt,
+      navStyle,
+      heroStyle,
+      sectionOneStyle,
+      sectionTwoStyle,
+      sectionThreeStyle,
+      sectionFourStyle,
+      sectionFiveStyle,
+      sectionSixStyle,
+      footerStyle,
+      webDesignImagePreview,
+    } = req.body;
 
     const accessToken = req.cookies.accessToken;
 
