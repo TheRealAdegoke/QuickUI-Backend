@@ -36,6 +36,62 @@ const userSchema = new Schema({
           type: String,
         },
       },
+      sectionOneStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      sectionTwoStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      sectionThreeStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      sectionFourStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      sectionFiveStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      sectionSixStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
+      footerStyle: {
+        index: {
+          type: Number,
+        },
+        style: {
+          type: String,
+        },
+      },
       webDesignImagePreview: {
         type: String,
       },
