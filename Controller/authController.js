@@ -139,7 +139,7 @@ const authToken = async (req, res) => {
   }
 };
 
-//periodically check if the user is logged in then generate a new access token.
+// periodically check if the user is logged in then generate a new access token.
 const authRefreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;

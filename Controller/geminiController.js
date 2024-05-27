@@ -171,6 +171,13 @@ const landingPageDesign = async (req, res) => {
       prompt,
       navStyle,
       heroStyle,
+      sectionOneStyle,
+      sectionTwoStyle,
+      sectionThreeStyle,
+      sectionFourStyle,
+      sectionFiveStyle,
+      sectionSixStyle,
+      footerStyle,
       webDesignImagePreview,
       createdAt: new Date(),
     });
