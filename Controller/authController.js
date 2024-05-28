@@ -1,4 +1,5 @@
 const User = require("../Models/User");
+const Design = require("../Models/Design");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const tokens = require("../Utils/token");
@@ -43,7 +44,13 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    await newUser.save();
+    const savedUser = await newUser.save();
+
+    const newDesign = new Design({
+      userId: savedUser._id,
+    });
+
+    await newDesign.save()
 
     const { accessToken, refreshToken } = await tokens(newUser._id);
 
@@ -267,67 +274,6 @@ const resetpassword = async (req, res) => {
   }
 };
 
-const userData = async (req, res) => {
-  try {
-    const accessToken = req.cookies.accessToken;
-
-    if (!accessToken) {
-      return res.status(401).send({ error: "Please Login" });
-    }
-
-    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const user = verified.user;
-    const getUserData = await User.findById(user);
-
-    if (!user) {
-      return res.status(400).send({ error: "Invalid User" });
-    }
-
-    return res.status(200).json({
-      fullname: getUserData.fullName,
-      email: getUserData.email,
-      history: getUserData.promptHistory
-    });
-  } catch (error) {
-    console.error("error: ", error);
-    res.status(500).send({ "Internal Server Error: ": error });
-  }
-};
-
-const getPromptHistoryById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const accessToken = req.cookies.accessToken;
-
-    if (!accessToken) {
-      return res.status(401).send({ error: "Please Login" });
-    }
-
-    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const user = verified.user;
-    const getUserData = await User.findById(user);
-
-    if (!getUserData) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Find the promptHistory item by its _id
-    const promptHistoryItem = getUserData.promptHistory.find(
-      (item) => item._id.toString() === id
-    );
-
-    if (!promptHistoryItem) {
-      return res.status(404).json({ error: "Prompt history item not found" });
-    }
-
-    // Return the promptHistory item
-    return res.status(200).json(promptHistoryItem);
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
 module.exports = {
   registerUser,
   loginUser,
@@ -336,6 +282,4 @@ module.exports = {
   unauthenticateUser,
   forgotpassword,
   resetpassword,
-  userData,
-  getPromptHistoryById
 };

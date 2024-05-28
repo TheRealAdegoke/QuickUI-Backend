@@ -1,4 +1,5 @@
 const User = require("../Models/User");
+const Design = require("../Models/Design")
 const jwt = require("jsonwebtoken");
 const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
 const {
@@ -17,6 +18,7 @@ const {
   customerReviewText,
 } = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
+const { default: mongoose } = require("mongoose");
 
 const dummyResponses = {
   logo: "QuickUI",
@@ -149,51 +151,59 @@ const geminiChatResponses = async (req, res) => {
 
 const landingPageDesign = async (req, res) => {
   try {
-    const {
-      prompt,
-      navStyle,
-      heroStyle,
-      sectionOneStyle,
-      sectionTwoStyle,
-      sectionThreeStyle,
-      sectionFourStyle,
-      sectionFiveStyle,
-      sectionSixStyle,
-      footerStyle,
-      webDesignImagePreview,
-    } = req.body;
+     const {
+       prompt,
+       navStyle,
+       heroStyle,
+       sectionOneStyle,
+       sectionTwoStyle,
+       sectionThreeStyle,
+       sectionFourStyle,
+       sectionFiveStyle,
+       sectionSixStyle,
+       footerStyle,
+       webDesignImagePreview,
+     } = req.body;
 
-    const accessToken = req.cookies.accessToken;
+     const accessToken = req.cookies.accessToken;
 
-    if (!accessToken) {
-      return res.status(400).send({ error: "Please Login" });
-    }
+     if (!accessToken) {
+       return res.status(400).send({ error: "Please Login" });
+     }
 
-    const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const user = verified.user;
-    const getUserData = await User.findById(user);
+     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
+     const userId = verified.user;
 
-    if (prompt.trim() === "") {
-      return res.status(400).send({
-        error: "Empty Prompt",
-      });
-    }
+     // Find the Design document by userId
+     let userDesign = await Design.findOne({ userId });
 
-    getUserData.promptHistory.push({
-      prompt,
-      navStyle,
-      heroStyle,
-      sectionOneStyle,
-      sectionTwoStyle,
-      sectionThreeStyle,
-      sectionFourStyle,
-      sectionFiveStyle,
-      sectionSixStyle,
-      footerStyle,
-      webDesignImagePreview,
-      createdAt: new Date(),
-    });
-    await getUserData.save();
+     // If no Design document exists for this user, create a new one
+     if (!userDesign) {
+       userDesign = new Design({ userId, promptHistory: [] });
+     }
+
+     if (!prompt || prompt.trim() === "") {
+       return res.status(400).send({ error: "Empty Prompt" });
+     }
+
+     // Push the new design prompt to the promptHistory array
+     userDesign.promptHistory.push({
+       prompt,
+       navStyle,
+       heroStyle,
+       sectionOneStyle,
+       sectionTwoStyle,
+       sectionThreeStyle,
+       sectionFourStyle,
+       sectionFiveStyle,
+       sectionSixStyle,
+       footerStyle,
+       webDesignImagePreview,
+       createdAt: new Date(),
+     });
+
+     // Save the updated Design document
+     await userDesign.save();
 
     res.status(200).send({ message: "saved" });
   } catch (error) {
