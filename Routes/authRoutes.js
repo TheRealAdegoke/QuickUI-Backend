@@ -8,8 +8,6 @@ const {
   unauthenticateUser,
   forgotpassword,
   resetpassword,
-  userData,
-  getPromptHistoryById,
 } = require("../Controller/authController");
 const {
   passportAuthForGoogle,
@@ -20,6 +18,7 @@ const {
   registerWithGoogle,
   loginWithGoogle,
 } = require("../middleware/passportMiddleware");
+const { getPromptHistoryById, userData } = require("../Controller/userDataController");
 
 router.post("/register", registerUser);
 
