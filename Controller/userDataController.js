@@ -11,8 +11,7 @@ const userData = async (req, res) => {
     }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const userId = verified.user; // Assuming the JWT payload contains user ID as 'user'
-
+    const userId = verified.user;
     const getUserData = await User.findById(userId);
     const getDesignData = await Design.findOne({ userId });
 
@@ -49,15 +48,15 @@ const getPromptHistoryById = async (req, res) => {
     }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
-    const user = verified.user;
-    const getUserData = await User.findById(user);
+    const userId = verified.user;
+    const getDesignData = await Design.findOne({ userId });
 
-    if (!getUserData) {
-      return res.status(404).json({ error: "User not found" });
+    if (!getDesignData) {
+      return res.status(400).send({ error: "Invalid User" });
     }
 
     // Find the promptHistory item by its _id
-    const promptHistoryItem = getUserData.promptHistory.find(
+    const promptHistoryItem = getDesignData.promptHistory.find(
       (item) => item._id.toString() === id
     );
 
