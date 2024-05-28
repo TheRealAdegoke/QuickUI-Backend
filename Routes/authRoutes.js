@@ -18,7 +18,12 @@ const {
   registerWithGoogle,
   loginWithGoogle,
 } = require("../middleware/passportMiddleware");
-const { getPromptHistoryById, userData } = require("../Controller/userDataController");
+const {
+  getPromptHistoryById,
+  userData,
+  recreatePromptHistory,
+  deletePromptHistory,
+} = require("../Controller/userDataController");
 
 router.post("/register", registerUser);
 
@@ -34,7 +39,7 @@ router.get("/google/signup", passportAuthForRegister);
 
 router.get("/google/login", passportAuthForLogin);
 
-router.get("/loggedIn", authToken)
+router.get("/loggedIn", authToken);
 
 router.post("/refresh", authRefreshToken);
 
@@ -44,8 +49,12 @@ router.post("/forgotpassword", forgotpassword);
 
 router.post("/resetpassword", resetpassword);
 
-router.get("/user-data", userData)
+router.get("/user-data", userData);
 
 router.get("/user-data/:id", getPromptHistoryById);
+
+router.post("/recreate-prompt-history/:id", recreatePromptHistory);
+
+router.delete("/delete-prompt-history/:id", deletePromptHistory);
 
 module.exports = router;
