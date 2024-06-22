@@ -30,6 +30,7 @@ app.use(
       process.env.CORS_RENDER,
       process.env.CORS_VITE_LOCAL_HOST_SUB_DOMAIN,
       process.env.CORS_VERCEL_FRONTEND,
+      process.env.CORS_VERCEL_BACKEND,
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
