@@ -17,6 +17,21 @@ require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
 const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
+const rateLimit = require("express-rate-limit");
+
+// Apply rate limiter to the /api/auth route
+const authLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // Limit each IP to 10 requests per window
+  message: "Too many attempts, please try again after 5 minutes",
+});
+
+// Apply rate limiter to the /api route (third parties routes)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // Limit each IP to 100 requests per window
+  message: "Too many requests, please try again after 1 minute",
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -30,7 +45,8 @@ app.use(
       process.env.CORS_RENDER,
       process.env.CORS_VITE_LOCAL_HOST_SUB_DOMAIN,
       process.env.CORS_VERCEL_FRONTEND,
-      process.env.CORS_VERCEL_BACKEND,
+      process.env.CORS_QUICKUI_CO,
+      process.env.CORS_WWW_QUICKUI_CO,
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
@@ -54,8 +70,8 @@ app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api", thirdPartiesRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api", apiLimiter, thirdPartiesRoutes);
 
 const port = 3000;
 

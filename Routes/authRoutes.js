@@ -19,8 +19,10 @@ const {
   loginWithGoogle,
 } = require("../middleware/passportMiddleware");
 const {
-  getPromptHistoryById,
   userData,
+  updateFullName,
+  updatePassword,
+  getPromptHistoryById,
   recreatePromptHistory,
   deletePromptHistory,
 } = require("../Controller/userDataController");
@@ -50,6 +52,10 @@ router.post("/forgotpassword", forgotpassword);
 router.post("/resetpassword", resetpassword);
 
 router.get("/user-data", userData);
+
+router.put("/updateFullName", updateFullName);
+
+router.put("/updatePassword", updatePassword);
 
 router.get("/user-data/:id", getPromptHistoryById);
 
