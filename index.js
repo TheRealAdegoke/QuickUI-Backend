@@ -70,8 +70,8 @@ app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-app.use("/api/auth", authLimiter, authRoutes);
-app.use("/api", apiLimiter, thirdPartiesRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api", thirdPartiesRoutes);
 
 const port = 3000;
 
