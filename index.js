@@ -17,21 +17,6 @@ require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
 const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
-const rateLimit = require("express-rate-limit");
-
-// Apply rate limiter to the /api/auth route
-const authLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // Limit each IP to 10 requests per window
-  message: "Too many attempts, please try again after 5 minutes",
-});
-
-// Apply rate limiter to the /api route (third parties routes)
-const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10, // Limit each IP to 100 requests per window
-  message: "Too many requests, please try again after 1 minute",
-});
 
 app.use(express.json());
 app.use(cookieParser());

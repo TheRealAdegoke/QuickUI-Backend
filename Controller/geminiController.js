@@ -63,11 +63,6 @@ const handleAPIError = async (prompt, prefix, index = null) => {
 const geminiChatResponses = async (req, res) => {
   try {
     const { prompt } = req.body;
-    const accessToken = req.cookies.accessToken;
-
-    if (!accessToken) {
-      return res.status(400).send({ error: "Please Login" });
-    }
 
     if (prompt.trim() === "") {
       return res.status(400).send({
