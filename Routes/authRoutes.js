@@ -26,10 +26,18 @@ const {
   recreatePromptHistory,
   deletePromptHistory,
 } = require("../Controller/userDataController");
+const rateLimit = require("express-rate-limit");
 
-router.post("/register", registerUser);
+// Apply rate limiter to the /api/auth route
+const authLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // Limit each IP to 10 requests per window
+  message: "Too many attempts, please try again after 5 minutes",
+});
 
-router.post("/login", loginUser);
+router.post("/register", authLimiter, registerUser);
+
+router.post("/login", authLimiter, loginUser);
 
 router.get("/googlesignup", registerWithGoogle);
 
@@ -45,17 +53,17 @@ router.get("/loggedIn", authToken);
 
 router.post("/refresh", authRefreshToken);
 
-router.post("/logout", unauthenticateUser);
+router.post("/logout", authLimiter, unauthenticateUser);
 
-router.post("/forgotpassword", forgotpassword);
+router.post("/forgotpassword", authLimiter, forgotpassword);
 
-router.post("/resetpassword", resetpassword);
+router.post("/resetpassword", authLimiter, resetpassword);
 
 router.get("/user-data", userData);
 
-router.put("/updateFullName", updateFullName);
+router.put("/updateFullName", authLimiter, updateFullName);
 
-router.put("/updatePassword", updatePassword);
+router.put("/updatePassword", authLimiter, updatePassword);
 
 router.get("/user-data/:id", getPromptHistoryById);
 

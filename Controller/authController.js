@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
     const { accessToken, refreshToken } = await tokens(user._id);
 
     res
-      .status(201)
+      .status(200)
       .cookie("accessToken", accessToken, {
         maxAge: 600000,
         httpOnly: true,

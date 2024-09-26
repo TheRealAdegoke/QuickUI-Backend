@@ -1,8 +1,16 @@
 const express = require("express")
 const router = express.Router();
 const { geminiChatResponses, landingPageDesign } = require("../Controller/geminiController");
+const rateLimit = require("express-rate-limit");
 
-router.post("/quick-ai", geminiChatResponses);
-router.post("/save-landing-styles", landingPageDesign)
+// Apply rate limiter to the /api route (third parties routes)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // Limit each IP to 100 requests per window
+  message: "Too many requests, please try again after 1 minute",
+});
+
+router.post("/quick-ai", apiLimiter, geminiChatResponses);
+router.post("/save-landing-styles", apiLimiter, landingPageDesign)
 
 module.exports = router
