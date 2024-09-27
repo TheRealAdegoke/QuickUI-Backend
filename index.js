@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
     console.log('Running in production environment.')
 }
 
-const express = require("express");
+const express = require("express"); 
 const cookieParser = require("cookie-parser");
 const app = express();
 const connectDB = require("./Database/connectDB");
