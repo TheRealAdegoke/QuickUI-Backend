@@ -49,7 +49,7 @@ app.use(
 
 // Initialize passport middleware
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.session());  
 
 app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
