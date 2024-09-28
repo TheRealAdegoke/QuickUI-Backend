@@ -32,6 +32,7 @@ app.use(
       process.env.CORS_VERCEL_FRONTEND,
       process.env.CORS_QUICKUI_CO,
       process.env.CORS_WWW_QUICKUI_CO,
+      process.env.CORS_AZURE,
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
