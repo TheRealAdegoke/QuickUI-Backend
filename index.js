@@ -45,7 +45,9 @@ app.use(
     resave: false,
     saveUninitialized: true,
   })
-);
+); 
+
+
 
 // Initialize passport middleware
 app.use(passport.initialize());
