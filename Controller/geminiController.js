@@ -1,4 +1,5 @@
 const Design = require("../Models/Design");
+const User = require("../Models/User");
 const jwt = require("jsonwebtoken");
 const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
 const {
@@ -154,6 +155,18 @@ const landingPageDesign = async (req, res) => {
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
+
+    let user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).send({ error: "User not found" });
+    }
+
+    // Check the user's trials count and subtract 1 if greater than 0
+    if (user.trials > 0) {
+      user.trials -= 1;
+      await user.save();
+    }
 
     // Find the Design document by userId
     let userDesign = await Design.findOne({ userId });
