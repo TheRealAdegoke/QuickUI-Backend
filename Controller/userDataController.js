@@ -33,6 +33,7 @@ const userData = async (req, res) => {
       fullname: getUserData.fullName,
       email: getUserData.email,
       history: getDesignData.promptHistory,
+      status: getUserData.status
     });
   } catch (error) {
     console.error("Error fetching user data:", error);
