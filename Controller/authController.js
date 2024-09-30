@@ -48,6 +48,7 @@ const registerUser = async (req, res) => {
       LemonSqueezyCreatedAt: "",
       productName: "",
       variantName: "",
+      trials: 3
     });
 
     const savedUser = await newUser.save();

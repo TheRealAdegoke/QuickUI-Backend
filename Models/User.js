@@ -26,6 +26,7 @@ const userSchema = new Schema({
   productName: String,
   variantName: String,
   eventName: String,
+  trials: Number
 });
 
 const User = mongoose.model("User", userSchema);
