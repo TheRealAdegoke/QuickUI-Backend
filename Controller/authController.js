@@ -42,6 +42,12 @@ const registerUser = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
+      productId: "",
+      variantId: "",
+      status: "free",
+      LemonSqueezyCreatedAt: "",
+      productName: "",
+      variantName: "",
     });
 
     const savedUser = await newUser.save();

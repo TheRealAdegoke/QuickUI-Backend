@@ -19,6 +19,13 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  productId: String,
+  variantId: String,
+  status: String,
+  LemonSqueezyCreatedAt: Date,
+  productName: String,
+  variantName: String,
+  eventName: String,
 });
 
 const User = mongoose.model("User", userSchema);

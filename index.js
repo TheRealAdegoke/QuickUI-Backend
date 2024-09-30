@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require("express"); 
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 const app = express();
 const connectDB = require("./Database/connectDB");
 const cors = require("cors");
@@ -17,8 +18,10 @@ require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
 const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
+const lemonSqueezyRoute = require("./Routes/LemonSqueezyRoute");
 
-app.use(express.json());
+
+app.use("/api/webhook", bodyParser.text({ type: "*/*" }));
 app.use(cookieParser());
 
 app.use(
@@ -33,12 +36,12 @@ app.use(
       process.env.CORS_QUICKUI_CO,
       process.env.CORS_WWW_QUICKUI_CO,
       process.env.CORS_AZURE,
+      process.env.CORS_NODE_LOCAL_HOST_PORT_AUTH,
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
   })
 );
-
 
 app.use(
   session({
@@ -48,8 +51,6 @@ app.use(
   })
 ); 
 
-
-
 // Initialize passport middleware
 app.use(passport.initialize());
 app.use(passport.session());  
@@ -58,8 +59,9 @@ app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api", thirdPartiesRoutes);
+app.use("/api/auth", express.json(), authRoutes);
+app.use("/api", express.json(), thirdPartiesRoutes);
+app.use("/api", lemonSqueezyRoute);
 
 const port = 3000;
 
