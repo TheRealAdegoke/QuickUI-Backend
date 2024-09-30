@@ -43,7 +43,6 @@ app.use(
   })
 );
 
-
 app.use(
   session({
     secret: process.env.JWT_SECRET,
@@ -51,8 +50,6 @@ app.use(
     saveUninitialized: true,
   })
 ); 
-
-
 
 // Initialize passport middleware
 app.use(passport.initialize());
