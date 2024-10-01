@@ -48,15 +48,8 @@ app.use(
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      sameSite: 'lax',  // Set SameSite to Lax
-      secure: true, // Ensure secure cookies in production
-      httpOnly: true, // Ensure cookies are not accessible via JavaScript
-      maxAge: 60000, // Optional: Set a maxAge if needed
-    },
   })
-);
-
+); 
 
 
 // Initialize passport middleware
