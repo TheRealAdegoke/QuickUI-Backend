@@ -67,14 +67,14 @@ const registerUser = async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({
@@ -119,14 +119,14 @@ const loginUser = async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", refreshToken, {
         maxAge: 432000000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({
@@ -182,7 +182,7 @@ const authRefreshToken = async (req, res) => {
         maxAge: 600000,
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send();
@@ -201,14 +201,14 @@ const unauthenticateUser = async (req, res) => {
         expires: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .cookie("refreshToken", "", {
         expires: new Date(0),
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({ message: "Logged out" });
@@ -237,7 +237,7 @@ const forgotpassword = async (req, res) => {
         maxAge: 3600000, // 1 hour expiration time
         httpOnly: true,
         path: "/",
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       })
       .send({ message: "Reset password link sent to your email" });
