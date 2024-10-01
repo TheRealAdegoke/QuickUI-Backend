@@ -3,6 +3,7 @@ const Design = require("../Models/Design");
 const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const cloudinary = require("cloudinary").v2;
 
 const userData = async (req, res) => {
   try {
@@ -41,6 +42,12 @@ const userData = async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const updateFullName = async (req, res) => {
   try {
@@ -222,7 +229,7 @@ const recreatePromptHistory = async (req, res) => {
 
 const deletePromptHistory = async (req, res) => {
   try {
-    const { id } = req.params; // assuming the ID is passed as a URL parameter
+    const { id } = req.params;
     const accessToken = req.cookies.accessToken;
 
     if (!accessToken) {
@@ -246,6 +253,14 @@ const deletePromptHistory = async (req, res) => {
       return res.status(404).send({ error: "Prompt history item not found" });
     }
 
+    // Get the Cloudinary public ID from the URL
+    const imageUrl =
+      getDesignData.promptHistory[promptHistoryIndex].webDesignImagePreview;
+    const publicId = imageUrl.split("/").pop().split(".")[0];
+
+    // Delete the image from Cloudinary
+    await cloudinary.uploader.destroy(publicId);
+
     // Remove the item from the promptHistory array
     getDesignData.promptHistory.splice(promptHistoryIndex, 1);
 
@@ -253,7 +268,9 @@ const deletePromptHistory = async (req, res) => {
     await getDesignData.save();
 
     // Return the updated document
-    return res.status(200).send({message: "History deleted"});
+    return res
+      .status(200)
+      .send({ message: "History and associated image deleted" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ error: "Internal Server Error" });
