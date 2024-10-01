@@ -24,9 +24,9 @@ const lemonSqueezyRoute = require("./Routes/LemonSqueezyRoute");
 app.use("/api/webhook", bodyParser.text({ type: "*/*" }));
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: [
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
       process.env.CORS_GOOGLE,
       process.env.CORS_VITE_LOCAL_HOST,
       process.env.CORS_NODE_LOCAL_HOST,
@@ -37,11 +37,19 @@ app.use(
       process.env.CORS_WWW_QUICKUI_CO,
       process.env.CORS_AZURE,
       process.env.CORS_NODE_LOCAL_HOST_PORT_AUTH,
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
-  })
-);
+    ];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 
 app.use(
   session({
