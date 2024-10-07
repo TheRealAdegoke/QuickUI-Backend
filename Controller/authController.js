@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
       LemonSqueezyCreatedAt: "",
       productName: "",
       variantName: "",
-      trials: 3
+      trials: 3,
     });
 
     const savedUser = await newUser.save();
@@ -57,29 +57,15 @@ const registerUser = async (req, res) => {
       userId: savedUser._id,
     });
 
-    await newDesign.save()
+    await newDesign.save();
 
-    const { accessToken, refreshToken } = await tokens(newUser._id);
+    const { accessToken, refreshToken } = tokens(newUser._id);
 
-    res
-      .status(201)
-      .cookie("accessToken", accessToken, {
-        maxAge: 600000,
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .cookie("refreshToken", refreshToken, {
-        maxAge: 432000000,
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .send({
-        message: "User registered successfully",
-      });
+    res.status(201).send({
+      message: "User registered successfully",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     console.error("Error Registering user", error);
     return res.status(500).send({ error: "Internal Server Error" });
@@ -111,27 +97,13 @@ const loginUser = async (req, res) => {
       return res.status(401).send({ error: "Invalid Password" });
     }
 
-    const { accessToken, refreshToken } = await tokens(user._id);
+    const { accessToken, refreshToken } = tokens(user._id);
 
-    res
-      .status(200)
-      .cookie("accessToken", accessToken, {
-        maxAge: 600000,
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .cookie("refreshToken", refreshToken, {
-        maxAge: 432000000,
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .send({
-        message: "Logged In",
-      });
+    res.status(200).send({
+      message: "Logged In",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     console.error("Error Signing In User", error);
     res.status(500).send({ error: "Internal Server Error" });
@@ -173,19 +145,11 @@ const authRefreshToken = async (req, res) => {
     }
 
     // Generate a new access token
-    const { accessToken } = await tokens(verified.user);
+    const { accessToken } = tokens(verified.user);
 
-    // Set the new access token in the response cookie
-    res
-      .status(200)
-      .cookie("accessToken", accessToken, {
-        maxAge: 600000,
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .send();
+    res.status(201).send({
+      accessToken: accessToken,
+    });
   } catch (error) {
     console.error("Error refreshing token:", error);
     return res.status(500).send({ error: "Internal Server Error" });
@@ -227,20 +191,14 @@ const forgotpassword = async (req, res) => {
     }
 
     // Generate a reset password token
-    const { forgotpasswordToken } = await tokens(user._id);
+    const { forgotpasswordToken } = tokens(user._id);
 
     sendResetPasswordLink(email, user.fullName);
 
-    res
-      .status(200)
-      .cookie("resetToken", forgotpasswordToken, {
-        maxAge: 3600000, // 1 hour expiration time
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .send({ message: "Reset password link sent to your email" });
+    res.status(200).send({
+      message: "Reset password link sent to your email",
+      forgotpasswordToken: forgotpasswordToken,
+    });
   } catch (error) {
     console.error("Error sending reset password link:", error);
     res.status(500).send({ error: "Internal Server Error" });
