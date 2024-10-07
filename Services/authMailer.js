@@ -78,7 +78,7 @@ const sendResetPasswordLink = async (email, fullName) => {
     secure: true,
   });
 
-  const resetPasswordLink = `${process.env.CORS_VERCEL_FRONTEND}/resetpassword`;
+  const resetPasswordLink = `${process.env.CORS_QUICKUI_CO}/resetpassword`;
 
   await new Promise((resolve, reject) => {
     // verify connection configuration
