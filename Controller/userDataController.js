@@ -7,14 +7,22 @@ const cloudinary = require("cloudinary").v2;
 
 const userData = async (req, res) => {
   try {
-    const accessToken = req.cookies.accessToken;
+    // Get the access token from the Authorization header
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
-      return res.status(401).send({ error: "Please Login" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    // Verify the token
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
+
+    // Fetch user data
     const getUserData = await User.findById(userId);
     const getDesignData = await Design.findOne({ userId });
 
@@ -26,7 +34,7 @@ const userData = async (req, res) => {
       return res.status(200).json({
         fullname: getUserData.fullName,
         email: getUserData.email,
-        history: [], // If no design data, return empty history
+        history: [], // Return empty history if no design data
       });
     }
 
@@ -35,13 +43,14 @@ const userData = async (req, res) => {
       email: getUserData.email,
       history: getDesignData.promptHistory,
       status: getUserData.status,
-      trial: getUserData.trials
+      trial: getUserData.trials,
     });
   } catch (error) {
     console.error("Error fetching user data:", error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
