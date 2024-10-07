@@ -36,7 +36,7 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    sendWelcomeEmail(email, fullName);
+    await sendWelcomeEmail(email, fullName);
 
     const newUser = new User({
       fullName,
@@ -175,7 +175,7 @@ const forgotpassword = async (req, res) => {
     // Generate a reset password token
     const { forgotpasswordToken } = tokens(user._id);
 
-    sendResetPasswordLink(email, user.fullName);
+    await sendResetPasswordLink(email, user.fullName);
 
     res.status(200).send({
       message: "Reset password link sent to your email",
