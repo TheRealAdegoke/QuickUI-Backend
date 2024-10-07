@@ -163,31 +163,6 @@ const authRefreshToken = async (req, res) => {
   }
 };
 
-//log a user out
-const unauthenticateUser = async (req, res) => {
-  try {
-    res
-      .status(200)
-      .cookie("accessToken", "", {
-        expires: new Date(0),
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .cookie("refreshToken", "", {
-        expires: new Date(0),
-        httpOnly: true,
-        path: "/",
-        sameSite: "none",
-        secure: true,
-      })
-      .send({ message: "Logged out" });
-  } catch (error) {
-    res.status(500).send({ error: "Internal Server Error" });
-  }
-};
-
 const forgotpassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -249,7 +224,6 @@ module.exports = {
   loginUser,
   authToken,
   authRefreshToken,
-  unauthenticateUser,
   forgotpassword,
   resetpassword,
 };
