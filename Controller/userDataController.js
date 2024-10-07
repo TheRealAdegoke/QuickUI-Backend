@@ -61,11 +61,13 @@ cloudinary.config({
 const updateFullName = async (req, res) => {
   try {
     const { newFullName } = req.body;
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -91,9 +93,7 @@ const updateFullName = async (req, res) => {
       return res.status(404).send({ error: "User not found" });
     }
 
-    return res
-      .status(200)
-      .send({ message: "Full name updated successfully" });
+    return res.status(200).send({ message: "Full name updated successfully" });
   } catch (error) {
     console.error("Error updating full name", error);
     return res.status(500).send({ error: "Internal Server Error" });
@@ -103,11 +103,13 @@ const updateFullName = async (req, res) => {
 const updatePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -158,11 +160,13 @@ const updatePassword = async (req, res) => {
 const getPromptHistoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -192,11 +196,13 @@ const getPromptHistoryById = async (req, res) => {
 const recreatePromptHistory = async (req, res) => {
   try {
     const { id } = req.params; // assuming the ID is passed as a URL parameter
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -229,7 +235,7 @@ const recreatePromptHistory = async (req, res) => {
     await getDesignData.save();
 
     // Return the updated document
-    return res.status(200).send({message: "History duplicated"});
+    return res.status(200).send({ message: "History duplicated" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ error: "Internal Server Error" });
@@ -239,11 +245,13 @@ const recreatePromptHistory = async (req, res) => {
 const deletePromptHistory = async (req, res) => {
   try {
     const { id } = req.params;
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;

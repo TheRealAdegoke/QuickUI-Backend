@@ -147,11 +147,13 @@ const landingPageDesign = async (req, res) => {
   try {
     const { prompt, style, webDesignImagePreview } = req.body;
 
-    const accessToken = req.cookies.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(400).send({ error: "Please Login" });
     }
+
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;

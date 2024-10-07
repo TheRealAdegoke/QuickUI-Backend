@@ -112,12 +112,16 @@ const loginUser = async (req, res) => {
 
 const authToken = async (req, res) => {
   try {
-    const accessToken = req.cookies.accessToken;
+    // Get the access token from the Authorization header
+    const authHeader = req.headers.authorization;
 
-    if (!accessToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.send({ authenticated: false });
     }
 
+    const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    // Verify the token
     jwt.verify(accessToken, process.env.JWT_SECRET);
     res.send({ authenticated: true });
   } catch (error) {
@@ -128,12 +132,15 @@ const authToken = async (req, res) => {
 // periodically check if the user is logged in then generate a new access token.
 const authRefreshToken = async (req, res) => {
   try {
-    const { refreshToken } = req.cookies;
-    if (!refreshToken) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(400).send("Please Login");
     }
 
-    // Verify the token
+    const refreshToken = authHeader.split(" ")[1];
+
+    // Verify the refresh token
     const verified = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
     // Calculate the expiration time of the token
@@ -207,13 +214,13 @@ const forgotpassword = async (req, res) => {
 
 const resetpassword = async (req, res) => {
   try {
-    const { password } = req.body;
-    const resetToken = req.cookies.resetToken;
+    const authHeader = req.headers.authorization;
 
-    // Check if reset token exists
-    if (!resetToken) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(400).send({ error: "Reset token not found" });
     }
+
+    const resetToken = authHeader.split(" ")[1]; // Extract the token
 
     // Verify the reset token
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
@@ -225,11 +232,8 @@ const resetpassword = async (req, res) => {
     }
 
     // Update user's password with the new one
-    user.password = await bcrypt.hash(password, 10);
+    user.password = await bcrypt.hash(req.body.password, 10);
     await user.save();
-
-    // Clear reset token cookie
-    res.clearCookie("resetToken", { path: "/" });
 
     // Send response
     res.status(200).send({ message: "Password reset successful" });
@@ -238,6 +242,7 @@ const resetpassword = async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
 
 module.exports = {
   registerUser,
