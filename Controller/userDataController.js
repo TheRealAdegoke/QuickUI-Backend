@@ -286,7 +286,7 @@ const deletePromptHistory = async (req, res) => {
     // Return the updated document
     return res
       .status(200)
-      .send({ message: "History and associated image deleted" });
+      .send({ message: "History deleted" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ error: "Internal Server Error" });
