@@ -5,7 +5,6 @@ const {
   loginUser,
   authToken,
   authRefreshToken,
-  unauthenticateUser,
   forgotpassword,
   resetpassword,
 } = require("../Controller/authController");
@@ -52,8 +51,6 @@ router.get("/google/login", passportAuthForLogin);
 router.get("/loggedIn", authToken);
 
 router.post("/refresh", authRefreshToken);
-
-router.post("/logout", authLimiter, unauthenticateUser);
 
 router.post("/forgotpassword", authLimiter, forgotpassword);
 

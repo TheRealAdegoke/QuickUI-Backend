@@ -1,6 +1,6 @@
 const User = require("../Models/User");
 const Design = require("../Models/Design");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cloudinary = require("cloudinary").v2;
@@ -50,7 +50,6 @@ const userData = async (req, res) => {
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -300,5 +299,5 @@ module.exports = {
   updatePassword,
   getPromptHistoryById,
   recreatePromptHistory,
-  deletePromptHistory
+  deletePromptHistory,
 };
