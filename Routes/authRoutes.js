@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 const {
   registerUser,
@@ -24,6 +26,7 @@ const {
   getPromptHistoryById,
   recreatePromptHistory,
   deletePromptHistory,
+  uploadImage
 } = require("../Controller/userDataController");
 const rateLimit = require("express-rate-limit");
 
@@ -67,5 +70,7 @@ router.get("/user-data/:id", getPromptHistoryById);
 router.post("/recreate-prompt-history/:id", recreatePromptHistory);
 
 router.delete("/delete-prompt-history/:id", deletePromptHistory);
+
+router.post("/upload", upload.single("image"), uploadImage);
 
 module.exports = router;

@@ -26,6 +26,11 @@ const designSchema = new Schema({
       },
     },
   ],
+  imageGallery: [
+    {
+      type: String,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
