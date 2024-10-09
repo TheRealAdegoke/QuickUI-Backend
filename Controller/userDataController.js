@@ -310,49 +310,45 @@ const uploadImage = async (req, res) => {
     }
 
     // Upload the file to Cloudinary using buffer data from memory storage
-    const result = await cloudinary.uploader
-      .upload_stream(
-        {
-          resource_type: "auto", // Automatically determine the resource type
-          folder: "design_images", // Optional: specify folder
-        },
-        async (error, result) => {
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "design_images" }, // Optional: specify folder
+        (error, result) => {
           if (error) {
-            console.error("Cloudinary upload error:", error);
-            return res.status(500).send({ error: "Cloudinary upload failed" });
+            return reject(error);
           }
-
-          // Fetch the user's design data
-          const getDesignData = await Design.findOne({ userId });
-          if (!getDesignData) {
-            return res.status(400).send({ error: "Invalid User" });
-          }
-
-          // Ensure imageGallery is initialized
-          if (!getDesignData.imageGallery) {
-            getDesignData.imageGallery = [];
-          }
-
-          // Add the uploaded image's URL to the imageGallery array
-          getDesignData.imageGallery.push(result.secure_url);
-
-          // Save the updated document
-          await getDesignData.save();
-
-          // Respond with success message and image URL
-          return res.status(200).send({
-            message: "Image uploaded and saved successfully",
-            imageUrl: result.secure_url,
-          });
+          resolve(result);
         }
-      )
-      .end(req.file.buffer); // Pass the buffer directly
+      );
+      uploadStream.end(req.file.buffer); // Pass the buffer directly
+    });
+
+    // Fetch the user's design data
+    const getDesignData = await Design.findOne({ userId });
+    if (!getDesignData) {
+      return res.status(400).send({ error: "Invalid User" });
+    }
+
+    // Ensure imageGallery is initialized
+    if (!getDesignData.imageGallery) {
+      getDesignData.imageGallery = [];
+    }
+
+    // Add the uploaded image's URL to the imageGallery array
+    getDesignData.imageGallery.push(result.secure_url);
+
+    // Save the updated document
+    await getDesignData.save();
+
+    return res.status(200).send({
+      message: "Image uploaded and saved successfully",
+      imageUrl: result.secure_url,
+    });
   } catch (error) {
     console.error("Error uploading image:", error);
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
-
 
 
 module.exports = {
