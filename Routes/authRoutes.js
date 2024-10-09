@@ -1,6 +1,6 @@
 const express = require("express");
-// const multer = require("multer");
-// const upload = multer({ dest: "uploads/" });
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 const {
   registerUser,
@@ -71,6 +71,6 @@ router.post("/recreate-prompt-history/:id", recreatePromptHistory);
 
 router.delete("/delete-prompt-history/:id", deletePromptHistory);
 
-// router.post("/upload", upload.single("image"), uploadImage);
+router.post("/upload", upload.single("image"), uploadImage);
 
 module.exports = router;
