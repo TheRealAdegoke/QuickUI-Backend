@@ -1,6 +1,5 @@
 const express = require("express");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 const {
   registerUser,
@@ -29,6 +28,11 @@ const {
   uploadImage
 } = require("../Controller/userDataController");
 const rateLimit = require("express-rate-limit");
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Use memory storage instead of disk storage
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
 
 // Apply rate limiter to the /api/auth route
 const authLimiter = rateLimit({

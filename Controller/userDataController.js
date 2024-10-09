@@ -296,7 +296,6 @@ const deletePromptHistory = async (req, res) => {
 const uploadImage = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).send({ error: "Please Login" });
     }
@@ -305,43 +304,55 @@ const uploadImage = async (req, res) => {
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
 
-    // Check if the file was uploaded in the request
+    // Check if file is provided
     if (!req.file) {
       return res.status(400).send({ error: "No file uploaded" });
     }
 
-    // Upload the image to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "design_images", // Optional: specify a folder in Cloudinary
-    });
+    // Upload the file to Cloudinary using buffer data from memory storage
+    const result = await cloudinary.uploader
+      .upload_stream(
+        {
+          resource_type: "auto", // Automatically determine the resource type
+          folder: "design_images", // Optional: specify folder
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return res.status(500).send({ error: "Cloudinary upload failed" });
+          }
 
-    // Fetch the design document for the current user
-    const getDesignData = await Design.findOne({ userId });
+          // Fetch the user's design data
+          const getDesignData = await Design.findOne({ userId });
+          if (!getDesignData) {
+            return res.status(400).send({ error: "Invalid User" });
+          }
 
-    if (!getDesignData) {
-      return res.status(400).send({ error: "Invalid User" });
-    }
+          // Ensure imageGallery is initialized
+          if (!getDesignData.imageGallery) {
+            getDesignData.imageGallery = [];
+          }
 
-    // Ensure imageGallery is initialized
-    if (!getDesignData.imageGallery) {
-      getDesignData.imageGallery = []; // Initialize as an empty array if it's undefined
-    }
+          // Add the uploaded image's URL to the imageGallery array
+          getDesignData.imageGallery.push(result.secure_url);
 
-    // Add the uploaded image's URL to the imageGallery array
-    getDesignData.imageGallery.push(result.secure_url);
+          // Save the updated document
+          await getDesignData.save();
 
-    // Save the updated document
-    await getDesignData.save();
-
-    return res.status(200).send({
-      message: "Image uploaded and saved successfully",
-      imageUrl: result.secure_url,
-    });
+          // Respond with success message and image URL
+          return res.status(200).send({
+            message: "Image uploaded and saved successfully",
+            imageUrl: result.secure_url,
+          });
+        }
+      )
+      .end(req.file.buffer); // Pass the buffer directly
   } catch (error) {
     console.error("Error uploading image:", error);
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
 
 
 module.exports = {
