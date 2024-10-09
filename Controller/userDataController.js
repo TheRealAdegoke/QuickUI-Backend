@@ -44,6 +44,7 @@ const userData = async (req, res) => {
       history: getDesignData.promptHistory,
       status: getUserData.status,
       trial: getUserData.trials,
+      imageGallery: getDesignData.imageGallery,
     });
   } catch (error) {
     console.error("Error fetching user data:", error);
