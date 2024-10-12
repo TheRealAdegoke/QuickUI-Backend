@@ -18,6 +18,10 @@ const userData = async (req, res) => {
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
 
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
+
     // Verify the token
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -64,10 +68,16 @@ const updateFullName = async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -106,10 +116,16 @@ const updatePassword = async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -163,10 +179,16 @@ const getPromptHistoryById = async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -199,10 +221,16 @@ const recreatePromptHistory = async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -248,10 +276,16 @@ const deletePromptHistory = async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
 
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
@@ -285,9 +319,7 @@ const deletePromptHistory = async (req, res) => {
     await getDesignData.save();
 
     // Return the updated document
-    return res
-      .status(200)
-      .send({ message: "History deleted" });
+    return res.status(200).send({ message: "History deleted" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ error: "Internal Server Error" });
@@ -297,11 +329,19 @@ const deletePromptHistory = async (req, res) => {
 const uploadImage = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send({ error: "Please Login" });
+      return res
+        .status(401)
+        .send({ error: "Authorization token missing or invalid" });
     }
 
     const accessToken = authHeader.split(" ")[1]; // Extract the token
+
+    if (!accessToken) {
+      return res.status(401).send({ error: "Please Login" });
+    }
+
     const verified = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = verified.user;
 
@@ -350,7 +390,6 @@ const uploadImage = async (req, res) => {
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
-
 
 module.exports = {
   userData,
