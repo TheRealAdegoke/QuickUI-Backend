@@ -5,7 +5,7 @@ const searchImages = async (req, res) => {
     const { prompt } = req.body;
 
     const perPage = 30; // Unsplash allows a maximum of 30 results per page
-    const maxImages = 50; // We want to get up to 50 images
+    const maxImages = 54; // We want to get up to 50 images
     let imageUrls = [];
 
     // Fetch the first batch of images (up to 30)
