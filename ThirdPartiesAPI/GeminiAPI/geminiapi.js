@@ -6,7 +6,7 @@ const {
 } = require("@google/generative-ai");
 
 // Define your API key and other constants
-const MODEL_NAME = "gemini-1.0-pro";
+const MODEL_NAME = "gemini-1.5-flash";
 const API_KEY = process.env.GEMINI_API;
 
 // Define a function to send prompt to Gemini API and receive response
