@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router();
-const { geminiChatResponses, landingPageDesign } = require("../Controller/geminiController");
+const { geminiChatResponses, unsplashImage, landingPageDesign } = require("../Controller/geminiController");
 const rateLimit = require("express-rate-limit");
 
 // Apply rate limiter to the /api route (third parties routes)
@@ -11,6 +11,7 @@ const apiLimiter = rateLimit({
 });
 
 router.post("/quick-ai", apiLimiter, geminiChatResponses);
+router.post("/quick-image", apiLimiter, unsplashImage);
 router.post("/save-landing-styles", apiLimiter, landingPageDesign)
 
 module.exports = router

@@ -61,7 +61,7 @@ const handleAPIError = async (prompt, prefix, index = null) => {
   }
 };
 
-const geminiChatResponses = async (req, res) => {
+const unsplashImage = async (req, res) => {
   try {
     const { prompt } = req.body;
 
@@ -86,60 +86,42 @@ const geminiChatResponses = async (req, res) => {
       return res.status(404).send({ error: error.message });
     }
 
-    const promptResponseForLogo = await handleAPIError(
-      prompt,
-      prefixForPrompts.promptPrefixLogo
-    );
-
-    const promptResponseForHeroHeader = await handleAPIError(
-      prompt,
-      prefixForPrompts.promptPrefixForHeroHeader
-    );
-
-    const promptResponseForHeroDescription = await handleAPIError(
-      prompt,
-      prefixForPrompts.promptPrefixForHeroDescription
-    );
-
-    const faqQuestions = [];
-    const faqAnswers = [];
-
-    for (let i = 0; i < 4; i++) {
-      const faqQuestion = await handleAPIError(
-        prompt,
-        prefixForPrompts.promptPrefixForFaqQuestion
-      );
-      const faqAnswer = await handleAPIError(
-        faqQuestion,
-        prefixForPrompts.promptPrefixForFAQAnswer
-      );
-      faqQuestions.push(faqQuestion);
-      faqAnswers.push(faqAnswer);
-    }
-
     res.status(200).json({
-      randomButtonText: randomButtonText,
-      logo: promptResponseForLogo,
-      heroHeader: promptResponseForHeroHeader,
-      heroDescription: promptResponseForHeroDescription,
-      featureHeaders: featureHeader,
-      customerHeaders: customerHeader,
-      customerParagraphTexts: customerParagraphText,
-      customerReviewTexts: customerReviewText,
-      teamHeaders: teamHeader,
-      teamParagraphTexts: teamParagraphText,
-      FAQsHeaders: FAQsHeader,
-      faqParagraphTexts: faqParagraphText,
-      faqQuestions: faqQuestions,
-      faqAnswers: faqAnswers,
-      statsHeaders: statsHeader,
-      partnerHeaders: partnerHeader,
-      contactHeaders: contactHeader,
       imageUrls: imageUrlsResponse.imageUrls,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const geminiChatResponses = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    // Get the response from the Gemini API
+    const response = await runChat(prompt);
+    res.json({ response });
+  } catch (error) {
+    console.error("Error with Gemini API:", error);
+
+    if (error.response && error.response.status === 429) {
+      // Handle "429 Too Many Requests" error
+      res.status(429).json({
+        error: "Too Many Requests. Please slow down and try again later.",
+      });
+    } else if (error.response && error.response.status === 503) {
+      // Handle "503 Service Unavailable" error
+      res.status(503).json({
+        error:
+          "Service Unavailable. The server is temporarily unable to handle the request. Please try again later.",
+      });
+    } else {
+      // Handle any other errors
+      res.status(500).json({
+        error: "Failed to generate response from Gemini API",
+      });
+    }
   }
 };
 
@@ -203,4 +185,5 @@ const landingPageDesign = async (req, res) => {
 module.exports = {
   geminiChatResponses,
   landingPageDesign,
+  unsplashImage,
 };
