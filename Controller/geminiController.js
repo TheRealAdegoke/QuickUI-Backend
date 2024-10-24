@@ -2,64 +2,7 @@ const Design = require("../Models/Design");
 const User = require("../Models/User");
 const jwt = require("jsonwebtoken");
 const { runChat } = require("../ThirdPartiesAPI/GeminiAPI/geminiapi");
-const {
-  prefixForPrompts,
-  randomButtonText,
-  FAQsHeader,
-  teamHeader,
-  featureHeader,
-  contactHeader,
-  customerHeader,
-  statsHeader,
-  partnerHeader,
-  customerParagraphText,
-  teamParagraphText,
-  faqParagraphText,
-  customerReviewText,
-} = require("../Utils/prefixObjects");
 const searchImages = require("./unsplashController");
-
-const dummyResponses = {
-  logo: "QuickUI",
-  heroHeader: "Quickly Design with QuickUI",
-  heroDescription: "Lorem ipsum",
-  faqQuestions: ["Question 1", "Question 2", "Question 3", "Question 4"],
-  faqAnswers:
-    "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.",
-};
-
-const handleAPIError = async (prompt, prefix, index = null) => {
-  try {
-    return await runChat(prefix + " " + prompt);
-  } catch (error) {
-    if (
-      error.message.includes("429 Too Many Requests") ||
-      error.message.includes("503 Service Unavailable")
-    ) {
-      // Return dummy text if rate limit is hit
-      switch (prefix) {
-        case prefixForPrompts.promptPrefixLogo:
-          return dummyResponses.logo;
-        case prefixForPrompts.promptPrefixForHeroHeader:
-          return dummyResponses.heroHeader;
-        case prefixForPrompts.promptPrefixForHeroDescription:
-          return dummyResponses.heroDescription;
-        case prefixForPrompts.promptPrefixForFaqQuestion:
-          if (index !== null && index < dummyResponses.faqQuestions.length) {
-            return dummyResponses.faqQuestions[index];
-          } else {
-            return dummyResponses.faqQuestions[0];
-          }
-        case prefixForPrompts.promptPrefixForFAQAnswer:
-          return dummyResponses.faqAnswers;
-        default:
-          throw new Error("Unknown prefix");
-      }
-    } else {
-      throw error; // Re-throw the error if it's not a rate limit error
-    }
-  }
-};
 
 const unsplashImage = async (req, res) => {
   try {
@@ -97,27 +40,24 @@ const unsplashImage = async (req, res) => {
 
 const geminiChatResponses = async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, history } = req.body;
 
     // Get the response from the Gemini API
-    const response = await runChat(prompt);
+    const response = await runChat(prompt, history);
     res.json({ response });
   } catch (error) {
     console.error("Error with Gemini API:", error);
 
     if (error.response && error.response.status === 429) {
-      // Handle "429 Too Many Requests" error
       res.status(429).json({
         error: "Too Many Requests. Please slow down and try again later.",
       });
     } else if (error.response && error.response.status === 503) {
-      // Handle "503 Service Unavailable" error
       res.status(503).json({
         error:
           "Service Unavailable. The server is temporarily unable to handle the request. Please try again later.",
       });
     } else {
-      // Handle any other errors
       res.status(500).json({
         error: "Failed to generate response from Gemini API",
       });
