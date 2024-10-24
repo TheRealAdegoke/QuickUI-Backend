@@ -1,16 +1,17 @@
-// Import necessary modules
+// GeminiAPI/geminiapi.js
 const {
   GoogleGenerativeAI,
   HarmCategory,
   HarmBlockThreshold,
 } = require("@google/generative-ai");
 
-// Define your API key and other constants
 const MODEL_NAME = "gemini-1.5-flash";
 const API_KEY = process.env.GEMINI_API;
 
-// Define a function to send prompt to Gemini API and receive response
-async function runChat(prompt) {
+// Create a singleton chat instance
+let chatInstance = null;
+
+async function initializeChat() {
   const genAI = new GoogleGenerativeAI(API_KEY);
   const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -40,18 +41,22 @@ async function runChat(prompt) {
     },
   ];
 
-  const chat = model.startChat({
+  chatInstance = model.startChat({
     generationConfig,
     safetySettings,
     history: [],
   });
 
-  const result = await chat.sendMessage(prompt);
-  const response = result.response;
-  return response.text();
+  return chatInstance;
 }
 
-// Export the function for use in other files
+async function runChat(prompt, history) {
+  if (!chatInstance) {
+    await initializeChat();
+  }
+
+  const result = await chatInstance.sendMessage(prompt);
+  return result.response.text();
+}
+
 module.exports = { runChat };
-
-
