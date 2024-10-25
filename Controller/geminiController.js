@@ -59,7 +59,8 @@ const geminiChatResponses = async (req, res) => {
       });
     } else {
       res.status(500).json({
-        error: "Failed to generate response from Gemini API",
+        error:
+          "Service Unavailable. The server is temporarily unable to handle the request. Please try again later.",
       });
     }
   }
