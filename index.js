@@ -1,12 +1,12 @@
 // Check if not in production environment, then load environment variables from .env file
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config()
-    console.log('Running in development.')
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+  console.log("Running in development.");
 } else {
-    console.log('Running in production environment.')
+  console.log("Running in production environment.");
 }
 
-const express = require("express"); 
+const express = require("express");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const app = express();
@@ -17,9 +17,11 @@ const passport = require("passport");
 require("./Strategies/passportConfig");
 
 const authRoutes = require("./Routes/authRoutes");
-const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes")
+const thirdPartiesRoutes = require("./Routes/thirdPartiesRoutes");
 const lemonSqueezyRoute = require("./Routes/LemonSqueezyRoute");
 
+// Enable trust proxy to correctly interpret the X-Forwarded-For header
+app.set("trust proxy", true);
 
 app.use("/api/webhook", bodyParser.text({ type: "*/*" }));
 app.use(cookieParser());
@@ -49,12 +51,11 @@ app.use(
     resave: false,
     saveUninitialized: true,
   })
-); 
-
+);
 
 // Initialize passport middleware
 app.use(passport.initialize());
-app.use(passport.session());  
+app.use(passport.session());
 
 app.get("/", (req, res) => {
   res.send("<h1>Lock and Load Cadet, shit is about to get ugly.</h1>");
@@ -75,6 +76,6 @@ const start = async () => {
   } catch (error) {
     console.log(error);
   }
-}; 
+};
 
 start();
